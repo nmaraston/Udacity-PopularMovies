@@ -80,9 +80,9 @@ public class DataPage<T> {
     @Override
     public String toString() {
         return "[ PageNumber=" + mPageNumber +
-                " TotalPageCount=" + mTotalPageCount +
-                " TotalResultCount=" + mTotalResultCount +
-                " Results=" + mResults +
+                ", TotalPageCount=" + mTotalPageCount +
+                ", TotalResultCount=" + mTotalResultCount +
+                ", Results=" + mResults +
                 " ]";
     }
 }
