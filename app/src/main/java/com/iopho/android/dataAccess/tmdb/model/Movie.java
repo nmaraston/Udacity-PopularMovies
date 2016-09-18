@@ -86,7 +86,7 @@ public class Movie {
     /**
      * @return relative path to the movie poster image.
      */
-    public String getPostPath() {
+    public String getPosterPath() {
         return mPosterPath;
     }
 
@@ -185,18 +185,18 @@ public class Movie {
     @Override
     public String toString() {
         return "[ PosterPath=" + mPosterPath +
-                " ,IsAdult=" + mIsAdult +
-                " ,Overview=" + mOverview +
-                " ,ReleaseDate=" + mReleaseDate +
-                " ,GenreIDs=" + mGenreIDs +
-                " ,ID=" + mID +
-                " ,OriginalTitle=" + mOriginalTitle +
-                " ,OriginalLanguage=" + mOriginalLanguageCode +
-                " ,Title=" + mTitle +
-                " ,Popularity=" + mPopularity +
-                " ,VoteCount=" + mVoteCount +
-                " ,HasVideo=" + mHasVideo +
-                " ,AverageVote=" + mAverageVote +
+                ", IsAdult=" + mIsAdult +
+                ", Overview=" + mOverview +
+                ", ReleaseDate=" + mReleaseDate +
+                ", GenreIDs=" + mGenreIDs +
+                ", ID=" + mID +
+                ", OriginalTitle=" + mOriginalTitle +
+                ", OriginalLanguage=" + mOriginalLanguageCode +
+                ", Title=" + mTitle +
+                ", Popularity=" + mPopularity +
+                ", VoteCount=" + mVoteCount +
+                ", HasVideo=" + mHasVideo +
+                ", AverageVote=" + mAverageVote +
                 " ]";
     }
 }
