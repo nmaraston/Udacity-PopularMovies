@@ -1,6 +1,8 @@
 package com.iopho.android.popularmovies;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -10,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.iopho.android.dataAccess.exception.DataAccessParsingException;
+import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.tmdb.TMDBMovieClient;
 import com.iopho.android.dataAccess.tmdb.TMDBClientFactory;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
@@ -17,9 +21,6 @@ import com.iopho.android.dataAccess.tmdb.model.Movie;
 
 import java.util.ArrayList;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MovieGalleryActivityFragment extends Fragment {
 
     private static final String LOG_TAG = MovieGalleryActivityFragment.class.getSimpleName();
@@ -30,6 +31,7 @@ public class MovieGalleryActivityFragment extends Fragment {
     private MovieGalleryArrayAdapter mMovieGalleryArrayAdapter;
     private GridView mMovieGridView;
     private ProgressDialog mProgressDialog;
+    private AlertDialog mAlertDialog;
 
     public MovieGalleryActivityFragment() {
     }
@@ -40,11 +42,32 @@ public class MovieGalleryActivityFragment extends Fragment {
 
         mTMDBClientFactory = new TMDBClientFactory(API_KEY);
 
+        // Create progress dialog
         mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setTitle("Loading");
-        mProgressDialog.setMessage("Loading movies...");
-        mProgressDialog.show();
+        mProgressDialog.setTitle(getString(R.string.movie_gallery_loading_dialog_title));
+        mProgressDialog.setMessage(getString(R.string.movie_gallery_loading_dialog_description));
 
+        // Create alert dialog
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.movie_gallery_alert_dialog_title))
+                .setMessage(getString(R.string.movie_gallery_alert_dialog_message))
+                .setPositiveButton(getString(R.string.movie_gallery_alert_dialog_retry_action),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                updateMoviesList();
+                            }
+                        })
+                .setNegativeButton(getString(R.string.movie_gallery_alert_dialog_cancel_action),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // Do nothing
+                            }
+                        });
+        mAlertDialog = alertDialogBuilder.create();
+
+        // Inflate fragment UI layout
         final View rootView = inflater.inflate(
                 R.layout.movie_gallery_activity_fragment, container, false);
         mMovieGridView = (GridView)rootView.findViewById(R.id.movie_gridview);
@@ -59,6 +82,7 @@ public class MovieGalleryActivityFragment extends Fragment {
     }
 
     private void updateMoviesList() {
+        mProgressDialog.show();
         final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
         fetchMoviesTask.execute();
     }
@@ -67,16 +91,18 @@ public class MovieGalleryActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final DataPage<Movie> moviesPage) {
-            if (mMovieGalleryArrayAdapter == null) {
-                mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(),
-                        new ArrayList<Movie>(), mTMDBClientFactory.getTMDBAssetURLFactory());
-                mMovieGridView.setAdapter(mMovieGalleryArrayAdapter);
-            }
             if (moviesPage != null) {
+                if (mMovieGalleryArrayAdapter == null) {
+                    mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(),
+                            new ArrayList<Movie>(), mTMDBClientFactory.getTMDBAssetURLFactory());
+                    mMovieGridView.setAdapter(mMovieGalleryArrayAdapter);
+                }
                 mMovieGalleryArrayAdapter.clear();
                 for (Movie movie : moviesPage.getResults()) {
                     mMovieGalleryArrayAdapter.add(movie);
                 }
+            } else {
+                mAlertDialog.show();
             }
 
             mProgressDialog.hide();
@@ -91,8 +117,8 @@ public class MovieGalleryActivityFragment extends Fragment {
                 }
                 TMDBMovieClient tmdbMovieClient = mTMDBClientFactory.getTMDBMovieClient();
                 return tmdbMovieClient.getTopRatedMovies(1);
-            } catch (Exception ex) {
-                Log.e(LOG_TAG, "Error", ex);
+            } catch (DataAccessRequestException | DataAccessParsingException ex) {
+                Log.e(LOG_TAG, "Failed to request top rated movies from TMDB.", ex);
             }
 
             return null;

@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
+
+    <!--
+        MovieGalleryActivityFragment loading dialog strings
+     -->
+    <string name="movie_gallery_loading_dialog_title">Loading</string>
+    <string name="movie_gallery_loading_dialog_description">Loading movies ...</string>
+
+    <!--
+        MovieGalleryActivityFragment alert dialog strings
+     -->
+    <string name="movie_gallery_alert_dialog_title">Network Error</string>
+    <string name="movie_gallery_alert_dialog_message">Failed to fetch movie metadata.</string>
+    <string name="movie_gallery_alert_dialog_retry_action">Retry</string>
+    <string name="movie_gallery_alert_dialog_cancel_action">Cancel</string>
+
 </resources>
