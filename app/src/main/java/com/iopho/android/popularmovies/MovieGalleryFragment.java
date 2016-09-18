@@ -27,8 +27,6 @@ public class MovieGalleryFragment extends Fragment {
 
     private static final String LOG_TAG = MovieGalleryFragment.class.getSimpleName();
 
-    private static final String API_KEY = "b70e10dcfb049ab5616c62edb2946e9e";
-
     private TMDBClientFactory mTMDBClientFactory;
     private MovieGalleryArrayAdapter mMovieGalleryArrayAdapter;
     private GridView mMovieGridView;
@@ -39,7 +37,10 @@ public class MovieGalleryFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
 
-        mTMDBClientFactory = new TMDBClientFactory(API_KEY);
+        final PopularMoviesApplication app =
+                (PopularMoviesApplication)getActivity().getApplicationContext();
+
+        mTMDBClientFactory = app.getTMDBClientFactory();
 
         // Create progress dialog
         mProgressDialog = new ProgressDialog(getActivity());
@@ -120,6 +121,7 @@ public class MovieGalleryFragment extends Fragment {
         protected DataPage<Movie> doInBackground(final Void... voids) {
 
             try {
+                // Initialize the TMDB client factory on first request
                 if (!mTMDBClientFactory.isInitialized()) {
                     mTMDBClientFactory.init();
                 }
