@@ -1,6 +1,5 @@
 package com.iopho.android.dataAccess.tmdb;
 
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.common.base.Preconditions;
@@ -21,68 +20,38 @@ import java.net.URL;
 import java.text.ParseException;
 
 /**
- * An implementation of a {@link TMDBClient}
+ * An implementation of a {@link TMDBMovieClient}
  */
-public class TMDBClientImpl implements TMDBClient {
+public class TMDBMovieClientImpl implements TMDBMovieClient {
 
-    private final static String LOG_TAG = TMDBClientImpl.class.getSimpleName();
+    private static final String LOG_TAG = TMDBMovieClientImpl.class.getSimpleName();
 
-    private final String TMDB_BASE_URL = "http://api.themoviedb.org/3/";
-
-    private enum TMDB_END_POINT {
-
-        POPULAR   ("movie/popular"),
-        TOP_RATED ("movie/top_rated");
-
-        private String endpointName;
-
-        TMDB_END_POINT(final String endpointName) {
-            this.endpointName = endpointName;
-        }
-
-        public String getEndpointName() {
-            return endpointName;
-        }
-    }
-
-    private enum TMDB_QUERY_PARAM {
-
-        PAGE    ("page"),
-        API_KEY ("api_key");
-
-        private String name;
-
-        TMDB_QUERY_PARAM(final String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
+    private final String mTMDBBaseURL;
     private final String mAPIKey;
     private final HttpURLDownloader mHTTPURLDownloader;
 
     /**
-     * Construct a new TMDBClientImpl.
+     * Construct a new TMDBMovieClientImpl.
      *
      * @param apiKey the TMDB API KEY. Required to make calls to the TMDB API. See
      *               <a href="https://www.themoviedb.org/documentation/api">
      *                   https://www.themoviedb.org/documentation/api</a>
      * @param httpURLDownloader an HttpURLDownloader to make HTTP requests.
      */
-    public TMDBClientImpl(final String apiKey, final HttpURLDownloader httpURLDownloader) {
+    public TMDBMovieClientImpl(final String tmdbBaseURL, final String apiKey,
+                               final HttpURLDownloader httpURLDownloader) {
 
+        Preconditions.checkNotNull(tmdbBaseURL, "tmdbBaseURL must not be null.");
         Preconditions.checkNotNull(apiKey, "apiKey must not be null.");
         Preconditions.checkNotNull(httpURLDownloader, "httpURLDownloader must not be null.");
 
+        this.mTMDBBaseURL = tmdbBaseURL;
         this.mAPIKey = apiKey;
         this.mHTTPURLDownloader = httpURLDownloader;
     }
 
     /**
-     * @see {@link TMDBClient#getTopRatedMovies(int)}
+     * @see {@link TMDBMovieClient#getTopRatedMovies(int)}
      */
     @Override
     public DataPage<Movie> getTopRatedMovies(final int pageNumber)
@@ -90,17 +59,15 @@ public class TMDBClientImpl implements TMDBClient {
 
         Preconditions.checkArgument(pageNumber >= 1, "pageNumber must be positive.");
 
-        final Uri requestUri = Uri.parse(TMDB_BASE_URL).buildUpon()
-                .appendEncodedPath(TMDB_END_POINT.TOP_RATED.getEndpointName())
-                .appendQueryParameter(TMDB_QUERY_PARAM.PAGE.getName(), String.valueOf(pageNumber))
-                .appendQueryParameter(TMDB_QUERY_PARAM.API_KEY.getName(), mAPIKey)
-                .build();
-
-        Log.d(LOG_TAG, "Attempting to download content at URI: " + requestUri.toString());
-
         try  {
 
-            final URL url = new URL(requestUri.toString());
+            final URL url = new TMDBURLBuilder(
+                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.END_POINT.MOVIES_TOP_RATED)
+                    .withQueryParam(TMDBURLBuilder.QUERY_PARAM_KEY.PAGE, String.valueOf(pageNumber))
+                    .build();
+
+            Log.d(LOG_TAG, "Attempting to download content at URI: " + url.toString());
+
             final String responseContent = mHTTPURLDownloader.downloadURL(url);
 
             final JSONObject contentJSONObject = new JSONObject(responseContent);

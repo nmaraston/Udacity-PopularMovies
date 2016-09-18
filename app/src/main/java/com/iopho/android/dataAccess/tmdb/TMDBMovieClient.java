@@ -9,12 +9,12 @@ import com.iopho.android.dataAccess.tmdb.model.Movie;
 /**
  * A TMDB (The Movie Database) client.
  *
- * A TMDBClient implements methods to interact with The Movie Database API.
+ * A TMDBMovieClient implements methods to interact with The Movie Database API.
  *
  * @see <a href="https://www.themoviedb.org/">https://www.themoviedb.org</a>
  * @see <a href="http://docs.themoviedb.apiary.io">TMDB API Documentation</a>
  */
-public interface TMDBClient {
+public interface TMDBMovieClient {
 
     /**
      * Queries TMDB to retrieve a page of Movies sorted by rating.
