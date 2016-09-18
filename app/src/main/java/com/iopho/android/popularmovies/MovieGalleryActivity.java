@@ -1,21 +1,13 @@
 package com.iopho.android.popularmovies;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.iopho.android.dataAccess.tmdb.TMDBClient;
-import com.iopho.android.dataAccess.tmdb.TMDBClientImpl;
-import com.iopho.android.dataAccess.tmdb.model.DataPage;
-import com.iopho.android.dataAccess.tmdb.model.Movie;
-import com.iopho.android.util.HttpURLDownloader;
 
 public class MovieGalleryActivity extends AppCompatActivity {
 
@@ -24,7 +16,7 @@ public class MovieGalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.movie_gallery_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -32,8 +24,6 @@ public class MovieGalleryActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
-                fetchMoviesTask.execute();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -60,22 +50,5 @@ public class MovieGalleryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private class FetchMoviesTask extends AsyncTask<Void, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            String apiKey = "b70e10dcfb049ab5616c62edb2946e9e";
-            TMDBClient tmdbClient = new TMDBClientImpl(apiKey, new HttpURLDownloader(10000, 10000));
-            try {
-                DataPage<Movie> moviesPage = tmdbClient.getTopRatedMovies(1);
-                Log.d(LOG_TAG, moviesPage.getResults().get(0).toString());
-            } catch (Exception ex) {
-                Log.e(LOG_TAG, "Error", ex);
-            }
-
-            return true;
-        }
     }
 }
