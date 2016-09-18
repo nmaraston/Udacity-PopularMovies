@@ -39,7 +39,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
      *                   https://www.themoviedb.org/documentation/api</a>
      * @param httpURLDownloader an HttpURLDownloader to make HTTP requests.
      */
-    public TMDBMovieClientImpl(final String tmdbBaseURL, final String apiKey,
+    TMDBMovieClientImpl(final String tmdbBaseURL, final String apiKey,
                                final HttpURLDownloader httpURLDownloader) {
 
         Preconditions.checkNotNull(tmdbBaseURL, "tmdbBaseURL must not be null.");

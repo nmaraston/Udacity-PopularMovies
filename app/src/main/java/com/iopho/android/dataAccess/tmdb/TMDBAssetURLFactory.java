@@ -20,7 +20,7 @@ public class TMDBAssetURLFactory {
      *                                      configuration values. The endpoint to request images
      *                                      from TMDB is provided via configuration.
      */
-    public TMDBAssetURLFactory(final TMDBConfigurationCacheManager tmdbConfigurationCacheManager) {
+    TMDBAssetURLFactory(final TMDBConfigurationCacheManager tmdbConfigurationCacheManager) {
 
         Preconditions.checkNotNull(tmdbConfigurationCacheManager,
                 "tmdbConfigurationCacheManager must not be null.");
