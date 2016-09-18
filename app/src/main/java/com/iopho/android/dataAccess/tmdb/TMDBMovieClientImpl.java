@@ -33,6 +33,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
     /**
      * Construct a new TMDBMovieClientImpl.
      *
+     * @param tmdbBaseURL the TMDB API base URL.
      * @param apiKey the TMDB API KEY. Required to make calls to the TMDB API. See
      *               <a href="https://www.themoviedb.org/documentation/api">
      *                   https://www.themoviedb.org/documentation/api</a>
@@ -62,8 +63,8 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
         try  {
 
             final URL url = new TMDBURLBuilder(
-                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.END_POINT.MOVIES_TOP_RATED)
-                    .withQueryParam(TMDBURLBuilder.QUERY_PARAM_KEY.PAGE, String.valueOf(pageNumber))
+                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.EndPoint.MOVIES_TOP_RATED)
+                    .withQueryParam(TMDBURLBuilder.QueryParamKey.PAGE, String.valueOf(pageNumber))
                     .build();
 
             Log.d(LOG_TAG, "Attempting to download content at URI: " + url.toString());
@@ -74,6 +75,8 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
 
             final JSONDataPageTransformer<Movie> jsonDataPageTransformer =
                     new JSONDataPageTransformer<>(new JSONMovieTransformer());
+
+            Log.d(LOG_TAG, "Successfully downloaded content at URI: " + url.toString());
 
             return jsonDataPageTransformer.transform(contentJSONObject);
 
