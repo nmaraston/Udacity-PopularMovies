@@ -1,11 +1,13 @@
 package com.iopho.android.dataAccess.tmdb.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.common.base.Preconditions;
 
 import java.util.Date;
 
-public class Movie {
+public class Movie implements Parcelable {
 
     private final String mPosterPath;
     private final boolean mIsAdult;
@@ -82,6 +84,86 @@ public class Movie {
         this.mHasVideo = hasVideo;
         this.mAverageVote = averageVote;
     }
+
+    /**
+     * Construct a new Movie given a {@link Parcel}
+     *
+     * @param in the {@link Parcel} containing serialized Movie data.
+     *
+     * @see {@link Parcel}
+     * @see {@link Parcelable}
+     */
+    private Movie(final Parcel in) {
+
+        Preconditions.checkNotNull(in, "in must not be null.");
+
+        this.mPosterPath = in.readString();
+        this.mIsAdult = in.readInt() != 0;
+        this.mOverview = in.readString();
+        this.mReleaseDate = (Date)in.readSerializable();
+        final int genreIDCount = in.readInt();
+        this.mGenreIDs = new long[genreIDCount];
+        in.readLongArray(mGenreIDs);
+        this.mID = in.readLong();
+        this.mOriginalTitle = in.readString();
+        this.mOriginalLanguageCode = in.readString();
+        this.mTitle = in.readString();
+        this.mBackdropPath = in.readString();
+        this.mPopularity = in.readDouble();
+        this.mVoteCount = in.readLong();
+        this.mHasVideo = in.readInt() != 0;
+        this.mAverageVote = in.readDouble();
+    }
+
+    /**
+     * @see {@link Parcelable#describeContents()}
+     */
+    @Override
+    public int describeContents() {
+        // No special objects contained in this Parcelable
+        return 0;
+    }
+
+    /**
+     * @see {@link Parcelable#writeToParcel(Parcel, int)}
+     */
+    @Override
+    public void writeToParcel(final Parcel out, final int i) {
+
+        Preconditions.checkNotNull(out, "out must not be null.");
+
+        out.writeString(mPosterPath);
+        out.writeInt(mIsAdult ? 1 : 0);
+        out.writeString(mOverview);
+        out.writeSerializable(mReleaseDate);
+        out.writeInt(mGenreIDs.length);
+        out.writeLongArray(mGenreIDs);
+        out.writeLong(mID);
+        out.writeString(mOriginalTitle);
+        out.writeString(mOriginalLanguageCode);
+        out.writeString(mTitle);
+        out.writeString(mBackdropPath);
+        out.writeDouble(mPopularity);
+        out.writeLong(mVoteCount);
+        out.writeInt(mHasVideo ? 1 : 0);
+        out.writeDouble(mAverageVote);
+    }
+
+    /**
+     * @see {@link android.os.Parcelable.Creator}
+     */
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+
+        @Override
+        public Movie createFromParcel(Parcel parcel) {
+            return new Movie(parcel);
+        }
+
+        @Override
+        public Movie[] newArray(final int size) {
+            return new Movie[size];
+        }
+    };
 
     /**
      * @return relative path to the movie poster image.
