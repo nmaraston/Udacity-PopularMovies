@@ -23,6 +23,14 @@ public class HttpURLDownloader {
 
     private static final String LOG_TAG = HttpURLDownloader.class.getSimpleName();
 
+    /**
+     * Store a value of 0. Pass as an argument to {@link #HttpURLDownloader(int, int)} to indicate
+     * an infinite read/connect timeout.
+     *
+     * @see {@link #HttpURLDownloader(int, int)}
+     */
+    public static final int INFINITE_TIMEOUT = 0;
+
     private final int mReadTimeout;
     private final int mConnectTimeout;
 
@@ -33,11 +41,12 @@ public class HttpURLDownloader {
      *                    reading from Input stream when a connection is established to a resource.
      *                    If the timeout expires before there is data available for read, a
      *                    {@link IOException} is raised. A timeout of zero is interpreted as an
-     *                    infinite timeout.
+     *                    infinite timeout (see {@link #INFINITE_TIMEOUT}).
      * @param connectTimeout specified timeout value, in milliseconds, to be used when opening a
      *                       communications link to the resource. If the timeout expires before the
      *                       connection can be established, a {@link IOException} is raised. A
-     *                       timeout of zero is interpreted as an infinite timeout.
+     *                       timeout of zero is interpreted as an infinite timeout (see
+     *                       {@link #INFINITE_TIMEOUT}).
      *
      * @see {@link HttpURLConnection#setReadTimeout(int)}
      * @see {@link HttpURLConnection#setConnectTimeout(int)}
