@@ -69,7 +69,7 @@ public class MovieGalleryFragment extends Fragment {
 
         // Inflate fragment UI layout
         final View rootView = inflater.inflate(
-                R.layout.movie_gallery_activity_fragment, container, false);
+                R.layout.fragment_movie_gallery, container, false);
         mMovieGridView = (GridView)rootView.findViewById(R.id.movie_gridview);
 
         return rootView;

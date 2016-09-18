@@ -1,7 +1,6 @@
 package com.iopho.android.popularmovies;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +43,7 @@ public class MovieGalleryArrayAdapter extends ArrayAdapter<Movie> {
 
         if (resultView == null) {
             resultView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.movie_gallery_item, parent, false);
+                    R.layout.grid_item_movie_poster, parent, false);
         }
 
         ImageView imageView = (ImageView)resultView.findViewById(R.id.movie_image_view);
