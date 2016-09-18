@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
+    public static final String MOVIE_INTENT_EXTRA = "Movie";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
