@@ -21,9 +21,9 @@ import com.iopho.android.dataAccess.tmdb.model.Movie;
 
 import java.util.ArrayList;
 
-public class MovieGalleryActivityFragment extends Fragment {
+public class MovieGalleryFragment extends Fragment {
 
-    private static final String LOG_TAG = MovieGalleryActivityFragment.class.getSimpleName();
+    private static final String LOG_TAG = MovieGalleryFragment.class.getSimpleName();
 
     private static final String API_KEY = "b70e10dcfb049ab5616c62edb2946e9e";
 
@@ -33,7 +33,7 @@ public class MovieGalleryActivityFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
 
-    public MovieGalleryActivityFragment() {
+    public MovieGalleryFragment() {
     }
 
     @Override

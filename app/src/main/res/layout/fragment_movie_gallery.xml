@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MovieGalleryActivityFragment"
-    tools:showIn="@layout/movie_gallery_activity">
+    tools:context=".MovieGalleryFragment"
+    tools:showIn="@layout/activity_movie_gallery">
 
     <GridView
         android:id="@+id/movie_gridview"
