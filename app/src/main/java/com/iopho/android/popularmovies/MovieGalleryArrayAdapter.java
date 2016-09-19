@@ -48,9 +48,9 @@ public class MovieGalleryArrayAdapter extends ArrayAdapter<Movie> {
 
         ImageView imageView = (ImageView)resultView.findViewById(R.id.movie_image_view);
 
-        Picasso.with(getContext()).setIndicatorsEnabled(true);
         Picasso.with(getContext())
-                .load(mTMDBAssetURLFactory.getPosterImageURL(movie.getPosterPath(), ImageSize.W_185))
+                .load(mTMDBAssetURLFactory.getPosterImageURL(
+                        movie.getPosterPath(), ImageSize.W_185))
                 .into(imageView);
 
         return imageView;

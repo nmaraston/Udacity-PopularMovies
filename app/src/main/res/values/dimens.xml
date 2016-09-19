@@ -3,4 +3,19 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!-- fragment_movie_detail.xml dimensions -->
+    <dimen name="movie_detail_header_height">140dp</dimen>
+    <dimen name="movie_detail_title_paddingleft">20dp</dimen>
+    <dimen name="movie_detail_title_textsize">40sp</dimen>
+    <dimen name="movie_detail_paddingtop">10dp</dimen>
+    <dimen name="movie_detail_paddingleft">10dp</dimen>
+    <dimen name="movie_detail_paddingright">10dp</dimen>
+    <dimen name="movie_detail_paddingbottom">10dp</dimen>
+    <dimen name="movie_detail_thumbnail_width">185dp</dimen>
+    <dimen name="movie_detail_thumbnail_height">278dp</dimen>
+    <dimen name="movie_detail_thumbnail_paddingleft">15dp</dimen>
+    <dimen name="movie_detail_thumbnail_paddingright">15dp</dimen>
+    <dimen name="movie_detail_release_date_textsize">38sp</dimen>
+    <dimen name="movie_detail_rating_textsize">14sp</dimen>
 </resources>
