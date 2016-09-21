@@ -78,7 +78,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
     }
 
     private DataPage<Movie> queryTMDBMovies(final TMDBURLBuilder.EndPoint endpoint,
-                                              final int pageNumber)
+                                            final int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException  {
 
         try  {
