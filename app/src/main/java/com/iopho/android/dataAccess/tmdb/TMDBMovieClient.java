@@ -1,6 +1,5 @@
 package com.iopho.android.dataAccess.tmdb;
 
-
 import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
@@ -19,11 +18,24 @@ public interface TMDBMovieClient {
     /**
      * Queries TMDB to retrieve a page of Movies sorted by rating.
      *
-     * @return a DataPage of Movie results from the TMDB TopRated result set.
+     * @param pageNumber page number of movies to return. Must be in range: [1, 1000].
+     * @return a {@link DataPage} of {@link Movie} results from the TMDB TopRated result set.
      * @throws DataAccessRequestException when unable to query TMDB. This can occur for various
-     *                                    reasons. The Exception cause is stored.
+     * reasons. The Exception cause is stored.
      * @throws DataAccessParsingException when unable to parse the TMDB response.
      */
     DataPage<Movie> getTopRatedMovies(int pageNumber)
+            throws DataAccessRequestException, DataAccessParsingException;
+
+    /**
+     * Queries TMDB to retrieve a page of Movies sorted by popularity.
+     *
+     * @param pageNumber page number of movies to return. Must be in range: [1, 1000].
+     * @return a {@link DataPage} of {@link Movie} results from the TMDB Popular result set.
+     * @throws DataAccessRequestException when unable to query TMDB. This can occur for various
+     * reasons. The Exception cause is stored.
+     * @throws DataAccessParsingException when unable to parse the TMDB response.
+     */
+    DataPage<Movie> getPopularMovies(int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException;
 }

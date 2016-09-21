@@ -58,12 +58,33 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
     public DataPage<Movie> getTopRatedMovies(final int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException {
 
-        Preconditions.checkArgument(pageNumber >= 1, "pageNumber must be positive.");
+        Preconditions.checkArgument(pageNumber >= 1 && pageNumber <= 1000,
+                "pageNumber must be in range [1, 1000].");
+
+        return queryTMDBMovies(TMDBURLBuilder.EndPoint.MOVIES_TOP_RATED, pageNumber);
+    }
+
+    /**
+     * @see {@link TMDBMovieClient#getPopularMovies(int)}
+     */
+    @Override
+    public DataPage<Movie> getPopularMovies(final int pageNumber)
+            throws DataAccessRequestException, DataAccessParsingException {
+
+        Preconditions.checkArgument(pageNumber >= 1 && pageNumber <= 1000,
+                "pageNumber must be in range [1, 1000].");
+
+        return queryTMDBMovies(TMDBURLBuilder.EndPoint.MOVIES_POPULAR, pageNumber);
+    }
+
+    private DataPage<Movie> queryTMDBMovies(final TMDBURLBuilder.EndPoint endpoint,
+                                              final int pageNumber)
+            throws DataAccessRequestException, DataAccessParsingException  {
 
         try  {
 
             final URL url = new TMDBURLBuilder(
-                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.EndPoint.MOVIES_TOP_RATED)
+                    mTMDBBaseURL, mAPIKey, endpoint)
                     .withQueryParam(TMDBURLBuilder.QueryParamKey.PAGE, String.valueOf(pageNumber))
                     .build();
 
