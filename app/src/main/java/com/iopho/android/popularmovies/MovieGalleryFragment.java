@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -125,8 +127,19 @@ public class MovieGalleryFragment extends Fragment {
                 if (!mTMDBClientFactory.isInitialized()) {
                     mTMDBClientFactory.init();
                 }
-                TMDBMovieClient tmdbMovieClient = mTMDBClientFactory.getTMDBMovieClient();
-                return tmdbMovieClient.getTopRatedMovies(1);
+                final TMDBMovieClient tmdbMovieClient = mTMDBClientFactory.getTMDBMovieClient();
+
+                final SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(getActivity());
+                final String sortOrderPref = sharedPreferences.getString(
+                        getString(R.string.pref_sort_order_key),
+                        getString(R.string.pref_sort_order_default));
+
+                if (getString(R.string.pref_sort_order_value_rating).equals(sortOrderPref)) {
+                    return tmdbMovieClient.getTopRatedMovies(1);
+                } else {
+                    return tmdbMovieClient.getPopularMovies(1);
+                }
             } catch (DataAccessRequestException | DataAccessParsingException ex) {
                 Log.e(LOG_TAG, "Failed to request top rated movies from TMDB.", ex);
             }
