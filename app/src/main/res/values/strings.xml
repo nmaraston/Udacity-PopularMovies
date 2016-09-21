@@ -36,7 +36,9 @@
     <string name="pref_sort_order_key" translatable="false">sort_order</string>
 
     <!-- Default unit for sort order preference [CHAR LIMIT=NONE] -->
-    <string name="pref_sort_order_default" translatable="false"></string>
+    <string name="pref_sort_order_default" translatable="false">
+        @string/pref_sort_order_value_rating
+    </string>
 
     <!-- Entries for sort order preference options -->
     <string name="pref_sort_order_entry_rating" translatable="false">Top Rated</string>
