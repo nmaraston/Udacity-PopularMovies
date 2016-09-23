@@ -23,7 +23,9 @@ import com.iopho.android.dataAccess.tmdb.TMDBClientFactory;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieGalleryFragment extends Fragment {
 
@@ -34,6 +36,7 @@ public class MovieGalleryFragment extends Fragment {
     private GridView mMovieGridView;
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
+    private List<Movie> movies;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -84,6 +87,10 @@ public class MovieGalleryFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle savedInstanceState) {
     }
 
     @Override
@@ -140,7 +147,7 @@ public class MovieGalleryFragment extends Fragment {
                 } else {
                     return tmdbMovieClient.getPopularMovies(1);
                 }
-            } catch (DataAccessRequestException | DataAccessParsingException ex) {
+            } catch (IOException | DataAccessRequestException | DataAccessParsingException ex) {
                 Log.e(LOG_TAG, "Failed to request top rated movies from TMDB.", ex);
             }
 

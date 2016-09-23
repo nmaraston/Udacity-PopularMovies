@@ -36,7 +36,7 @@ public class ApplicationProperties {
         final Resources resources = context.getResources();
 
         try {
-            InputStream resourceIn = resources.openRawResource(configFileId);
+            final InputStream resourceIn = resources.openRawResource(configFileId);
             mProperties = new Properties();
             mProperties.load(resourceIn);
         } catch (Resources.NotFoundException ex) {

@@ -1,9 +1,13 @@
 package com.iopho.android.dataAccess.tmdb;
 
+import android.content.Context;
+
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.util.HttpURLDownloader;
+
+import java.io.IOException;
 
 /**
  * The TMDBClientFactory is intended to be the main point of integration for an Android App.
@@ -28,17 +32,20 @@ public class TMDBClientFactory {
     /**
      * Construct a new TMDBClientFactory.
      *
+     * @param context the current {@link Context}
      * @param apiKey TMDB API key. Required to interact with the TMDB Web Service. See
      *               <a href="https://www.themoviedb.org/documentation/api">
      *                   https://www.themoviedb.org/documentation/api</a>
      */
-    public TMDBClientFactory(final String apiKey) {
-        this(apiKey, HttpURLDownloader.INFINITE_TIMEOUT, HttpURLDownloader.INFINITE_TIMEOUT);
+    public TMDBClientFactory(final Context context, final String apiKey) {
+        this(context, apiKey, HttpURLDownloader.INFINITE_TIMEOUT,
+                HttpURLDownloader.INFINITE_TIMEOUT);
     }
 
     /**
      * Construct a new TMDBClientFactory.
      *
+     * @param context the current {@link Context}
      * @param apiKey TMDB API key. Required to interact with the TMDB Web Service. See
      *               <a href="https://www.themoviedb.org/documentation/api">
      *                   https://www.themoviedb.org/documentation/api</a>
@@ -48,7 +55,8 @@ public class TMDBClientFactory {
      *                       TMDB Web Service. Most be a non-negative value. 0 indicates an infinite
      *                       timeout.
      */
-    public TMDBClientFactory(final String apiKey, final int readTimeout, final int connectTimeout) {
+    public TMDBClientFactory(final Context context, final String apiKey, final int readTimeout,
+                             final int connectTimeout) {
 
         Preconditions.checkNotNull(apiKey, "apiKey must not be null.");
         Preconditions.checkArgument(readTimeout >= 0, "readTimeout must be non-negative.");
@@ -60,7 +68,7 @@ public class TMDBClientFactory {
                 TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
         this.mTMDBMovieClient = new TMDBMovieClientImpl(TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
 
-        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(
+        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(context,
                 mTMDBConfigurationClient);
 
         this.mTMDBAssetURLFactory = new TMDBAssetURLFactory(mTMDBConfigurationCacheManager);
@@ -74,10 +82,13 @@ public class TMDBClientFactory {
      * This has the potential to trigger a network call to the TMDB web service and thus must not be
      * invoked when executing on the UI thread.
      *
-     * @throws DataAccessRequestException when network calls to the TMDB web service fail.
      * @throws DataAccessParsingException when failing to parse responses from the TMDB web service.
+     * @throws IOException when failing to read local configuration data
      */
-    public void init() throws DataAccessRequestException, DataAccessParsingException {
+    public synchronized void init() throws DataAccessParsingException, IOException {
+        if (mIsInitialized) {
+            return;
+        }
         mTMDBConfigurationCacheManager.init();
         mIsInitialized = true;
     }
@@ -89,7 +100,7 @@ public class TMDBClientFactory {
      * @return a {@link TMDBMovieClient}
      */
     public TMDBMovieClient getTMDBMovieClient() {
-        if (!isInitialized()) {
+        if (mIsInitialized) {
             throw new IllegalStateException(
                     "TMDBClientFactory is uninitialized. Must call #init() first.");
         }

@@ -36,7 +36,7 @@ public class PopularMoviesApplication extends Application {
         final String tmdbAPIKey = mApplicationProperties.getStringPropertyValue(
                 PopularMoviesAppProperties.PropertyKey.TMDB_API_KEY);
 
-        mTMDBClientFactory = new TMDBClientFactory(tmdbAPIKey);
+        mTMDBClientFactory = new TMDBClientFactory(this, tmdbAPIKey);
 
         // TODO: What is a better way of managing application environments?
         if (DEBUG_MODE) {
