@@ -2,6 +2,7 @@ package com.iopho.android.popularmovies;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
@@ -43,7 +44,7 @@ public class PopularMoviesApplication extends Application {
             mTMDBClientFactory.init();
         } catch (IOException | DataAccessParsingException ex) {
             // TODO: What is a better way of handling an unrecoverable event during application initialization?
-            throw new RuntimeException("Failed to initialize TMDB Client library.", ex);
+            throw new RuntimeException("Failed to initialize TMDB client library.", ex);
         }
 
         // TODO: What is a better way of managing application environments?

@@ -23,7 +23,6 @@ import com.iopho.android.dataAccess.tmdb.TMDBClientFactory;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +30,13 @@ public class MovieGalleryFragment extends Fragment {
 
     private static final String LOG_TAG = MovieGalleryFragment.class.getSimpleName();
 
+    private static final String MOVIES_BUNDLE_KEY = "MOVIES";
+
     private TMDBClientFactory mTMDBClientFactory;
     private MovieGalleryArrayAdapter mMovieGalleryArrayAdapter;
     private GridView mMovieGridView;
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
-    private List<Movie> movies;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -72,9 +72,14 @@ public class MovieGalleryFragment extends Fragment {
                         });
         mAlertDialog = alertDialogBuilder.create();
 
+        List<Movie> movies = new ArrayList<>();
+        if (savedInstanceState != null) {
+            movies = savedInstanceState.getParcelableArrayList(MOVIES_BUNDLE_KEY);
+        }
+
         // Create movie array adapter
-        mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(),
-                new ArrayList<Movie>(), mTMDBClientFactory.getTMDBAssetURLFactory());
+        mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(), movies,
+                mTMDBClientFactory.getTMDBAssetURLFactory());
 
         // Inflate fragment UI layout
         final View rootView = inflater.inflate(
@@ -98,12 +103,22 @@ public class MovieGalleryFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(final Bundle savedInstanceState) {
+
+        final ArrayList<Movie> movies = new ArrayList<>(mMovieGalleryArrayAdapter.getCount());
+        for (int i = 0; i < mMovieGalleryArrayAdapter.getCount(); i++) {
+            movies.add(mMovieGalleryArrayAdapter.getItem(i));
+        }
+        savedInstanceState.putParcelableArrayList(MOVIES_BUNDLE_KEY, movies);
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateMoviesList();
+        if (mMovieGalleryArrayAdapter.isEmpty()) {
+            updateMoviesList();
+        }
     }
 
     private void updateMoviesList() {

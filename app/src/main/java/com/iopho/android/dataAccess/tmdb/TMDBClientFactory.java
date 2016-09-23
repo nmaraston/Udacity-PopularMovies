@@ -100,7 +100,7 @@ public class TMDBClientFactory {
      * @return a {@link TMDBMovieClient}
      */
     public TMDBMovieClient getTMDBMovieClient() {
-        if (mIsInitialized) {
+        if (!mIsInitialized) {
             throw new IllegalStateException(
                     "TMDBClientFactory is uninitialized. Must call #init() first.");
         }
@@ -114,7 +114,7 @@ public class TMDBClientFactory {
      * @return a {@link TMDBAssetURLFactory}
      */
     public TMDBAssetURLFactory getTMDBAssetURLFactory() {
-        if (!isInitialized()) {
+        if (!mIsInitialized) {
             throw new IllegalStateException(
                     "TMDBClientFactory is uninitialized. Must call #init() first.");
         }
