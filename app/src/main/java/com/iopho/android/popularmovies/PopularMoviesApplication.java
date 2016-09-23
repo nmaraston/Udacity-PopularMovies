@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.common.base.Preconditions;
+import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.tmdb.TMDBClientFactory;
 import com.iopho.android.util.ApplicationProperties;
 import com.squareup.picasso.Picasso;
@@ -37,6 +38,13 @@ public class PopularMoviesApplication extends Application {
                 PopularMoviesAppProperties.PropertyKey.TMDB_API_KEY);
 
         mTMDBClientFactory = new TMDBClientFactory(this, tmdbAPIKey);
+
+        try {
+            mTMDBClientFactory.init();
+        } catch (IOException | DataAccessParsingException ex) {
+            // TODO: What is a better way of handling an unrecoverable event during application initialization?
+            throw new RuntimeException("Failed to initialize TMDB Client library.", ex);
+        }
 
         // TODO: What is a better way of managing application environments?
         if (DEBUG_MODE) {

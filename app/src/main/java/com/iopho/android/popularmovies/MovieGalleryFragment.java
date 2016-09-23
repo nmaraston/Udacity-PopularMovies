@@ -72,9 +72,15 @@ public class MovieGalleryFragment extends Fragment {
                         });
         mAlertDialog = alertDialogBuilder.create();
 
+        // Create movie array adapter
+        mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(),
+                new ArrayList<Movie>(), mTMDBClientFactory.getTMDBAssetURLFactory());
+
         // Inflate fragment UI layout
         final View rootView = inflater.inflate(
                 R.layout.fragment_movie_gallery, container, false);
+
+        // Setup the Movie GridView
         mMovieGridView = (GridView)rootView.findViewById(R.id.movie_gridview);
         mMovieGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -85,6 +91,7 @@ public class MovieGalleryFragment extends Fragment {
                 startActivity(detailIntent);
             }
         });
+        mMovieGridView.setAdapter(mMovieGalleryArrayAdapter);
 
         return rootView;
     }
@@ -110,11 +117,6 @@ public class MovieGalleryFragment extends Fragment {
         @Override
         protected void onPostExecute(final DataPage<Movie> moviesPage) {
             if (moviesPage != null) {
-                if (mMovieGalleryArrayAdapter == null) {
-                    mMovieGalleryArrayAdapter = new MovieGalleryArrayAdapter(getActivity(),
-                            new ArrayList<Movie>(), mTMDBClientFactory.getTMDBAssetURLFactory());
-                    mMovieGridView.setAdapter(mMovieGalleryArrayAdapter);
-                }
                 mMovieGalleryArrayAdapter.clear();
                 for (Movie movie : moviesPage.getResults()) {
                     mMovieGalleryArrayAdapter.add(movie);
@@ -130,10 +132,6 @@ public class MovieGalleryFragment extends Fragment {
         protected DataPage<Movie> doInBackground(final Void... voids) {
 
             try {
-                // Initialize the TMDB client factory on first request
-                if (!mTMDBClientFactory.isInitialized()) {
-                    mTMDBClientFactory.init();
-                }
                 final TMDBMovieClient tmdbMovieClient = mTMDBClientFactory.getTMDBMovieClient();
 
                 final SharedPreferences sharedPreferences =
@@ -147,7 +145,7 @@ public class MovieGalleryFragment extends Fragment {
                 } else {
                     return tmdbMovieClient.getPopularMovies(1);
                 }
-            } catch (IOException | DataAccessRequestException | DataAccessParsingException ex) {
+            } catch (DataAccessRequestException | DataAccessParsingException ex) {
                 Log.e(LOG_TAG, "Failed to request top rated movies from TMDB.", ex);
             }
 
