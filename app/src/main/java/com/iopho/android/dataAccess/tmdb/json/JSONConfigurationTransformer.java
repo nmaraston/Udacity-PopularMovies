@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A JSONConfigurationTransformer is an implementation of {@link JSONToObjectTransformer} to transform
- * a given {@link JSONObject} into a {@link Configuration}.
+ * A JSONConfigurationTransformer is an implementation of {@link JSONToObjectTransformer} to
+ * transform a given {@link JSONObject} into a {@link Configuration} and
+ * {@link ObjectToJSONTransformer} to perform the inverse transformation.
  */
 public class JSONConfigurationTransformer
         implements JSONToObjectTransformer<Configuration>, ObjectToJSONTransformer<Configuration> {
