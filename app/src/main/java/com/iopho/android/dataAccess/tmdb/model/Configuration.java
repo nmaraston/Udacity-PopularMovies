@@ -115,4 +115,16 @@ public class Configuration {
     public List<ImageSize> getAvailableStillImageSizes() {
         return mAvailableStillImageSizes;
     }
+
+    @Override
+    public String toString() {
+        return "[ AssetBaseURL=" + mAssetBaseURL +
+                ", AssetSecureBaseURL=" + mAssetSecureBaseURL +
+                ", AvailableBackdropImageSizes=" + mAvailableBackdropImageSizes +
+                ", AvailableLogoImageSizes=" + mAvailableLogoImageSizes +
+                ", AvailablePosterImageSizes=" + mAvailablePosterImageSizes +
+                ", AvailableProfileImageSizes=" + mAvailableProfileImageSizes +
+                ", AvailableStillImageSizes=" + mAvailableStillImageSizes +
+                " ]";
+    }
 }

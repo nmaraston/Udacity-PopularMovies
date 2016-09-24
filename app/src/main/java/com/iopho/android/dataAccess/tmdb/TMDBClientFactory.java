@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.exception.DataAccessRequestException;
+import com.iopho.android.dataAccess.tmdb.json.JSONConfigurationTransformer;
 import com.iopho.android.util.HttpURLDownloader;
 
 import java.io.IOException;
@@ -18,6 +19,8 @@ import java.io.IOException;
 public class TMDBClientFactory {
 
     private final String TMDB_BASE_URL = "http://api.themoviedb.org/3/";
+    private static final String TMDB_CONFIG_CACHE_FILE_NAME = "tmdb_remote_config";
+    private static final int TMDB_CONFIG_CACHE_TTL_DAYS = 1;
 
     private final HttpURLDownloader mHTTPURLDownloader;
 
@@ -68,8 +71,9 @@ public class TMDBClientFactory {
                 TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
         this.mTMDBMovieClient = new TMDBMovieClientImpl(TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
 
-        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(context,
-                mTMDBConfigurationClient);
+        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(
+                context, mTMDBConfigurationClient, new JSONConfigurationTransformer(),
+                TMDB_CONFIG_CACHE_FILE_NAME, TMDB_CONFIG_CACHE_TTL_DAYS);
 
         this.mTMDBAssetURLFactory = new TMDBAssetURLFactory(mTMDBConfigurationCacheManager);
 
