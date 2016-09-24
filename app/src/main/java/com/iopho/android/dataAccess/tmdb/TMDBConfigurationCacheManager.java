@@ -1,23 +1,19 @@
 package com.iopho.android.dataAccess.tmdb;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.util.Log;
 
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
-import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.tmdb.json.JSONConfigurationTransformer;
 import com.iopho.android.dataAccess.tmdb.model.Configuration;
 import com.iopho.android.popularmovies.R;
+import com.iopho.android.util.IOHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 
 /**
@@ -32,12 +28,14 @@ import java.text.ParseException;
  * initialized.
  *
  * NOTE: Currently the cache management solution is simple; on initialization the configuration is
- * read from a local file. Cache management will be triggering non-blocking calls to the TMDB API
- * to get an up to date configuration payload and cache it.
+ * read from a local file. Cache management will be improved by making non-blocking calls to the
+ * TMDB API to get an up to date configuration payload and cache it.
  */
 class TMDBConfigurationCacheManager {
 
     private static final String LOG_TAG = TMDBConfigurationCacheManager.class.getSimpleName();
+
+    private static final String CONFIGURATION_CACHE_FILE_NAME = "tmdb_remote_config";
 
     private final TMDBConfigurationClient mTMDBConfigurationClient;
 
@@ -76,7 +74,12 @@ class TMDBConfigurationCacheManager {
         if (mIsInitialized) {
             return;
         }
-        mConfiguration = getDefaultTMDBConfiguration();
+        mConfiguration = getCachedConfiguration();
+        if (mConfiguration == null) {
+            // Cache miss. This is a WIP. On cache miss we should fall back on our default config
+            // but also make a asynchronous call to get updated config from the TMDB Web Service.
+            mConfiguration = getDefaultStaticConfiguration();
+        }
         mIsInitialized = true;
     }
 
@@ -96,53 +99,58 @@ class TMDBConfigurationCacheManager {
     }
 
     /**
-     * Reads the default TMDB configuration from a local resource file.
+     * Retrieves the default TMDB configuration by reading a static hardcoded Resource file.
+     *
+     * @return {@link Configuration} constructed by reading the TMDB default config file.
+     * @throws IOException when failing to read the TMDB default configuration file.
+     * @throws DataAccessParsingException when failing to parse the TMDB default configuration.
      */
-    private Configuration getDefaultTMDBConfiguration()
+    private Configuration getDefaultStaticConfiguration()
             throws IOException, DataAccessParsingException {
 
-        final String defaultConfigurationFileContents = readResourceFile(R.raw.tmdb_default_config);
+        final String configurationContents = IOHelper.readResourceToString(
+                mContext, R.raw.tmdb_default_config);
+        return parseConfiguration(configurationContents);
+    }
+
+    /**
+     * Retrieves and returns TMDB configuration via a local file cache or null if no cache file
+     * exists.
+     *
+     * @return {@link Configuration} constructed by reading the TMDB config cache.
+     * @throws IOException when failing to read the TMDB configuration cache file.
+     * @throws DataAccessParsingException when failing to parse the TMDB configuration contained in
+     *                                    the cache file.
+     */
+    private Configuration getCachedConfiguration() throws IOException, DataAccessParsingException {
+
+        final File cacheFile = new File(mContext.getCacheDir(), CONFIGURATION_CACHE_FILE_NAME);
+
+        if (cacheFile.exists()) {
+            final String configurationContents = IOHelper.readFileToString(cacheFile);
+            return parseConfiguration(configurationContents);
+        }
+
+        return null;
+    }
+
+    /**
+     * Given string-ified TMDB configuration JSON, construct a {@link Configuration} model object.
+     *
+     * @param configurationJSONStr {@link String} containing TMDB configuration JSON.
+     * @return {@link Configuration} constructed from the given config JSON String.
+     * @throws DataAccessParsingException when failing to parse the given config JSON String.
+     */
+    private Configuration parseConfiguration(final String configurationJSONStr)
+            throws DataAccessParsingException {
 
         try {
-            final JSONObject configurationJSON = new JSONObject(defaultConfigurationFileContents);
+            final JSONObject configurationJSON = new JSONObject(configurationJSONStr);
             final JSONConfigurationTransformer jsonConfigurationTransformer =
                     new JSONConfigurationTransformer();
             return jsonConfigurationTransformer.transform(configurationJSON);
         } catch (JSONException | ParseException ex) {
-            throw new DataAccessParsingException("Failed to parse default configuration resource" +
-                    " file.", ex);
+            throw new DataAccessParsingException("Failed to parse configuration JSON.", ex);
         }
-    }
-
-    /**
-     * Reads the contents of a resource file into a {@link String} and returns it.
-     */
-    private String readResourceFile(final int resourceFileId) throws IOException {
-
-        final Resources resources = mContext.getResources();
-
-        final InputStream resourceIn;
-        BufferedReader reader = null;
-        StringBuffer result = new StringBuffer();
-
-        try {
-            resourceIn = resources.openRawResource(resourceFileId);
-            reader = new BufferedReader(new InputStreamReader(resourceIn, "UTF-8"));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    Log.e(LOG_TAG, "Failed to close buffered reader", ex);
-                }
-            }
-        }
-
-        return result.toString();
     }
 }
