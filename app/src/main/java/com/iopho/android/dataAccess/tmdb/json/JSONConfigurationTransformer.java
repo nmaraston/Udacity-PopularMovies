@@ -1,5 +1,7 @@
 package com.iopho.android.dataAccess.tmdb.json;
 
+import android.util.Log;
+
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.tmdb.model.Configuration;
 import com.iopho.android.dataAccess.tmdb.model.ImageSize;
@@ -19,6 +21,8 @@ import java.util.List;
  */
 public class JSONConfigurationTransformer
         implements JSONToObjectTransformer<Configuration>, ObjectToJSONTransformer<Configuration> {
+
+    private static final String LOG_TAG = JSONConfigurationTransformer.class.getSimpleName();
 
     private enum JSON_KEY {
 
@@ -108,7 +112,13 @@ public class JSONConfigurationTransformer
         final JSONArray jsonArray = jsonObject.getJSONArray(jsonKey);
 
         for (int i = 0; i < jsonArray.length(); i++) {
-            imageSizes.add(ImageSize.getImageSizeForTMDBKey(jsonArray.getString(i)));
+            final String imageSizeStr = jsonArray.getString(i);
+            final ImageSize imageSize = ImageSize.getImageSizeForTMDBKey(imageSizeStr);
+            if (imageSize != null) {
+                imageSizes.add(imageSize);
+            } else {
+                Log.w(LOG_TAG, "Unrecognized image size: " + imageSizeStr);
+            }
         }
 
         return imageSizes;
