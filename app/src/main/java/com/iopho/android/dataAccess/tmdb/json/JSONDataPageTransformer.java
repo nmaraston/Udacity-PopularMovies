@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A JSONDataPageTransformer is an implementation of a {@link JSONObjectTransformer}. It transforms
+ * A JSONDataPageTransformer is an implementation of a {@link JSONToObjectTransformer}. It transforms
  * a given JSONObject into a {@link DataPage}.
  *
  * @param <T> the type of Object contained in the DataPage being transformed to.
  */
-public class JSONDataPageTransformer<T> implements JSONObjectTransformer<DataPage<T>> {
+public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataPage<T>> {
 
     private enum JSON_KEY {
 
@@ -37,22 +37,22 @@ public class JSONDataPageTransformer<T> implements JSONObjectTransformer<DataPag
         }
     }
 
-    private final JSONObjectTransformer<T> resultJSONObjectTransformer;
+    private final JSONToObjectTransformer<T> resultJSONToObjectTransformer;
 
     /**
      * Construct a new JSONDataPageTransformer.
      *
-     * @param resultJSONObjectTransformer a {@link JSONObjectTransformer} that can transform a
+     * @param resultJSONToObjectTransformer a {@link JSONToObjectTransformer} that can transform a
      *                                    {@link JSONObject} into a instance of <b>T</b>. Used to
      *                                    transform the results of the JSON DataPage representation
      *                                    into instances of <b>T</b>.
      */
-    public JSONDataPageTransformer(final JSONObjectTransformer<T> resultJSONObjectTransformer) {
-        this.resultJSONObjectTransformer = resultJSONObjectTransformer;
+    public JSONDataPageTransformer(final JSONToObjectTransformer<T> resultJSONToObjectTransformer) {
+        this.resultJSONToObjectTransformer = resultJSONToObjectTransformer;
     }
 
     /**
-     * @see {@link JSONObjectTransformer#transform(JSONObject)}.
+     * @see {@link JSONToObjectTransformer#transform(JSONObject)}.
      */
     @Override
     public DataPage transform(final JSONObject jsonObject) throws JSONException, ParseException {
@@ -67,7 +67,7 @@ public class JSONDataPageTransformer<T> implements JSONObjectTransformer<DataPag
         final List<T> resultList = new ArrayList<>(resultsJSONArray.length());
 
         for (int i = 0; i < resultsJSONArray.length(); i++) {
-            resultList.add(resultJSONObjectTransformer.transform(
+            resultList.add(resultJSONToObjectTransformer.transform(
                     resultsJSONArray.getJSONObject(i)));
         }
 

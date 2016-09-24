@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A JSONConfigurationTransformer is an implementation of {@link JSONObjectTransformer} to transform
+ * A JSONConfigurationTransformer is an implementation of {@link JSONToObjectTransformer} to transform
  * a given {@link JSONObject} into a {@link Configuration}.
  */
-public class JSONConfigurationTransformer implements JSONObjectTransformer<Configuration> {
+public class JSONConfigurationTransformer
+        implements JSONToObjectTransformer<Configuration>, ObjectToJSONTransformer<Configuration> {
 
     private enum JSON_KEY {
 
@@ -41,7 +42,7 @@ public class JSONConfigurationTransformer implements JSONObjectTransformer<Confi
     }
 
     /**
-     * @see {@link JSONObjectTransformer#transform(JSONObject)}.
+     * @see {@link JSONToObjectTransformer#transform(JSONObject)}.
      */
     @Override
     public Configuration transform(final JSONObject jsonObject) throws JSONException, ParseException {
@@ -69,6 +70,36 @@ public class JSONConfigurationTransformer implements JSONObjectTransformer<Confi
                 availableStillImageSizes);
     }
 
+    /**
+     * @see {@link ObjectToJSONTransformer#transform(Object)}.
+     */
+    @Override
+    public JSONObject transform(final Configuration configuration) throws JSONException {
+
+        Preconditions.checkNotNull(configuration, "configuration must not be null.");
+
+        final JSONObject result = new JSONObject();
+        final JSONObject imageConfigJSON = new JSONObject();
+
+        imageConfigJSON.put(JSON_KEY.BASE_URL.getKeyName(), configuration.getAssetBaseURL());
+        imageConfigJSON.put(JSON_KEY.SECURE_BASE_URL.getKeyName(),
+                configuration.getAssetSecureBaseURL());
+        imageConfigJSON.put(JSON_KEY.BACKDROP_SIZES.getKeyName(),
+                buildImageSizeJSONArray(configuration.getAvailableBackdropImageSizes()));
+        imageConfigJSON.put(JSON_KEY.LOGO_SIZES.getKeyName(),
+                buildImageSizeJSONArray(configuration.getAvailableLogoImageSizes()));
+        imageConfigJSON.put(JSON_KEY.POSTER_SIZES.getKeyName(),
+                buildImageSizeJSONArray(configuration.getAvailablePosterImageSizes()));
+        imageConfigJSON.put(JSON_KEY.PROFILE_SIZES.getKeyName(),
+                buildImageSizeJSONArray(configuration.getAvailableProfileImageSizes()));
+        imageConfigJSON.put(JSON_KEY.STILL_SIZES.getKeyName(),
+                buildImageSizeJSONArray(configuration.getAvailableStillImageSizes()));
+
+        result.put(JSON_KEY.IMAGES.getKeyName(), imageConfigJSON);
+
+        return result;
+    }
+
     private List<ImageSize> parseImageSizeList(final JSONObject jsonObject, final String jsonKey)
             throws JSONException {
 
@@ -80,5 +111,14 @@ public class JSONConfigurationTransformer implements JSONObjectTransformer<Confi
         }
 
         return imageSizes;
+    }
+
+    private JSONArray buildImageSizeJSONArray(final List<ImageSize> imageSizes) {
+
+        final JSONArray result = new JSONArray();
+        for (ImageSize imageSize : imageSizes) {
+            result.put(imageSize.getTMDBKey());
+        }
+        return result;
     }
 }

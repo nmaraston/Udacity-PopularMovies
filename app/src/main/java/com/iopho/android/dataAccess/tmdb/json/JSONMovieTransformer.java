@@ -13,10 +13,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Implements a {@link JSONObjectTransformer} to transform a given {@link JSONObject} into a
+ * Implements a {@link JSONToObjectTransformer} to transform a given {@link JSONObject} into a
  * {@link Movie}.
  */
-public class JSONMovieTransformer implements JSONObjectTransformer<Movie> {
+public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
 
     private enum JSON_KEY {
         POSTER_PATH        ("poster_path"),
@@ -49,7 +49,7 @@ public class JSONMovieTransformer implements JSONObjectTransformer<Movie> {
 
 
     /**
-     * @see {@link JSONObjectTransformer#transform(JSONObject)}
+     * @see {@link JSONToObjectTransformer#transform(JSONObject)}
      *
      * @throws JSONException when an error occurs when attempting to read a key's value or a
      *                       required key is missing.

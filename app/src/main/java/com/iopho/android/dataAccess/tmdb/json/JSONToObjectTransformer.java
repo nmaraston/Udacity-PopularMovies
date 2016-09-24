@@ -1,17 +1,16 @@
 package com.iopho.android.dataAccess.tmdb.json;
 
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 
 /**
- * A JSONObjectTransformer transforms a {@link JSONObject} into an instance of <b>T</b>
+ * A JSONToObjectTransformer transforms a {@link JSONObject} into an instance of <b>T</b>
  *
  * @param <T> the type of instance to construct a given {@link JSONObject} from.
  */
-public interface JSONObjectTransformer<T> {
+public interface JSONToObjectTransformer<T> {
 
     /**
      * Given a {@link JSONObject}, use its serialized data to construct an instance of <b>T</b>.
