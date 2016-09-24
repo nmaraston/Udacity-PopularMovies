@@ -77,35 +77,40 @@ public class Configuration {
     }
 
     /**
-     * @return list of available image sizes for backdrop images.
+     * @return sorted list (from lowest to highest resolution) of available image sizes for backdrop
+     * images.
      */
     public List<ImageSize> getAvailableBackdropImageSizes() {
         return mAvailableBackdropImageSizes;
     }
 
     /**
-     * @return list of available image sizes for logo images.
+     * @return sorted list (from lowest to highest resolution) of available image sizes for logo
+     * images.
      */
     public List<ImageSize> getAvailableLogoImageSizes() {
         return mAvailableLogoImageSizes;
     }
 
     /**
-     * @return list of available image sizes for poster images.
+     * @return sorted list (from lowest to highest resolution) of available image sizes for poster
+     * images.
      */
     public List<ImageSize> getAvailablePosterImageSizes() {
         return mAvailablePosterImageSizes;
     }
 
     /**
-     * @return list of available image sizes for profile images.
+     * @return sorted list (from lowest to highest resolution) of available image sizes for profile
+     * images.
      */
     public List<ImageSize> getAvailableProfileImageSizes() {
         return mAvailableProfileImageSizes;
     }
 
     /**
-     * @return list of available image sizes for still images.
+     * @return sorted list (from lowest to highest resolution) of available image sizes for still
+     * images.
      */
     public List<ImageSize> getAvailableStillImageSizes() {
         return mAvailableStillImageSizes;
