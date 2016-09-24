@@ -62,7 +62,7 @@ public class TMDBAssetURLFactory {
         final String result = String.format("%s%s%s",
                 tmdbConfig.getAssetBaseURL(), resultImageSize.getTMDBKey(), relativePath);
 
-        Log.d(LOG_TAG, "Constructed poster image URL: " + result);
+        Log.v(LOG_TAG, "Constructed poster image URL: " + result);
 
         return result;
     }
