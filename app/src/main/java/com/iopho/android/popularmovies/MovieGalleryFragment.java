@@ -195,7 +195,7 @@ public class MovieGalleryFragment extends Fragment {
                 mAlertDialog.show();
             }
 
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
         }
 
         @Override
