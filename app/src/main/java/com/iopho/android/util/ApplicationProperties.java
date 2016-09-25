@@ -49,8 +49,8 @@ public class ApplicationProperties {
     }
 
     /**
-     * The value of the property associated with the given key. Returns null if the property key is
-     * not found.
+     * Returns the value of the property associated with the given key. Returns null if the property
+     * key is not found.
      *
      * @param key the property key
      * @return the value associated with the given property key or null if non exists.
@@ -59,5 +59,27 @@ public class ApplicationProperties {
 
         Preconditions.checkNotNull(key, "key must not be null.");
         return mProperties.getProperty(key);
+    }
+
+    /**
+     * Returns the value of the property associated with the given key. Returns null if the property
+     * key is not found or is unable to be parsed as an int.
+     *
+     * @param key the property key
+     * @return the value associated with the given property key or null if non exists or is not an
+     * int.
+     */
+    public Integer getIntPropertyValue(final String key) {
+
+        Preconditions.checkNotNull(key, "key must not be null.");
+
+        final String valueStr = mProperties.getProperty(key);
+
+        Integer result = null;
+        if (valueStr != null) {
+            result = Integer.valueOf(valueStr);
+        }
+
+        return result;
     }
 }

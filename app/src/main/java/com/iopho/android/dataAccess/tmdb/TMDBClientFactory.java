@@ -18,17 +18,15 @@ import java.io.IOException;
  */
 public class TMDBClientFactory {
 
-    private final String TMDB_BASE_URL = "http://api.themoviedb.org/3/";
-    private static final String TMDB_CONFIG_CACHE_FILE_NAME = "tmdb_remote_config";
-    private static final int TMDB_CONFIG_CACHE_TTL_DAYS = 1;
+    private final Context mContext;
+    private final String mAPIKey;
 
-    private final HttpURLDownloader mHTTPURLDownloader;
-
-    private final TMDBConfigurationClient mTMDBConfigurationClient;
-    private final TMDBMovieClient mTMDBMovieClient;
-
-    private final TMDBConfigurationCacheManager mTMDBConfigurationCacheManager;
-    private final TMDBAssetURLFactory mTMDBAssetURLFactory;
+    private TMDBProperties mTMDBProperties;
+    private HttpURLDownloader mHTTPURLDownloader;
+    private TMDBConfigurationClient mTMDBConfigurationClient;
+    private TMDBMovieClient mTMDBMovieClient;
+    private TMDBConfigurationCacheManager mTMDBConfigurationCacheManager;
+    private TMDBAssetURLFactory mTMDBAssetURLFactory;
 
     private boolean mIsInitialized;
 
@@ -41,42 +39,12 @@ public class TMDBClientFactory {
      *                   https://www.themoviedb.org/documentation/api</a>
      */
     public TMDBClientFactory(final Context context, final String apiKey) {
-        this(context, apiKey, HttpURLDownloader.INFINITE_TIMEOUT,
-                HttpURLDownloader.INFINITE_TIMEOUT);
-    }
 
-    /**
-     * Construct a new TMDBClientFactory.
-     *
-     * @param context the current {@link Context}
-     * @param apiKey TMDB API key. Required to interact with the TMDB Web Service. See
-     *               <a href="https://www.themoviedb.org/documentation/api">
-     *                   https://www.themoviedb.org/documentation/api</a>
-     * @param readTimeout timeout (in milliseconds) when reading data from the TMDB Web Service.
-     *                    Most be a non-negative value. 0 indicates an infinite timeout.
-     * @param connectTimeout timeout (in milliseconds) when attempting to open a connection to the
-     *                       TMDB Web Service. Most be a non-negative value. 0 indicates an infinite
-     *                       timeout.
-     */
-    public TMDBClientFactory(final Context context, final String apiKey, final int readTimeout,
-                             final int connectTimeout) {
-
+        Preconditions.checkNotNull(context, "context must not be null.");
         Preconditions.checkNotNull(apiKey, "apiKey must not be null.");
-        Preconditions.checkArgument(readTimeout >= 0, "readTimeout must be non-negative.");
-        Preconditions.checkArgument(connectTimeout >= 0, "connectTimeout must be non-negative.");
 
-        this.mHTTPURLDownloader = new HttpURLDownloader(readTimeout, connectTimeout);
-
-        this.mTMDBConfigurationClient = new TMDBConfigurationClient(
-                TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
-        this.mTMDBMovieClient = new TMDBMovieClientImpl(TMDB_BASE_URL, apiKey, mHTTPURLDownloader);
-
-        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(
-                context, mTMDBConfigurationClient, new JSONConfigurationTransformer(),
-                TMDB_CONFIG_CACHE_FILE_NAME, TMDB_CONFIG_CACHE_TTL_DAYS);
-
-        this.mTMDBAssetURLFactory = new TMDBAssetURLFactory(mTMDBConfigurationCacheManager);
-
+        this.mContext = context;
+        this.mAPIKey = apiKey;
         this.mIsInitialized = false;
     }
 
@@ -93,6 +61,25 @@ public class TMDBClientFactory {
         if (mIsInitialized) {
             return;
         }
+
+        mTMDBProperties = new TMDBProperties(mContext);
+
+        mHTTPURLDownloader = new HttpURLDownloader(
+                mTMDBProperties.getHTTPConnectTimeout(), mTMDBProperties.getHTTPReadTimeout());
+
+        this.mTMDBConfigurationClient = new TMDBConfigurationClient(
+                mTMDBProperties.getBaseURL(), mAPIKey, mHTTPURLDownloader);
+
+        this.mTMDBMovieClient = new TMDBMovieClientImpl(
+                mTMDBProperties.getBaseURL(), mAPIKey, mHTTPURLDownloader);
+
+        this.mTMDBConfigurationCacheManager = new TMDBConfigurationCacheManager(
+                mContext, mTMDBConfigurationClient, new JSONConfigurationTransformer(),
+                mTMDBProperties.getRemoteConfigCacheFileName(),
+                mTMDBProperties.getRemoteConfigCacheTTLDays());
+
+        this.mTMDBAssetURLFactory = new TMDBAssetURLFactory(mTMDBConfigurationCacheManager);
+
         mTMDBConfigurationCacheManager.init();
         mIsInitialized = true;
     }
