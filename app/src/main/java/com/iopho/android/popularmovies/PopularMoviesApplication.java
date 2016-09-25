@@ -26,12 +26,11 @@ public class PopularMoviesApplication extends Application {
         super.onCreate();
 
         try {
-            mApplicationProperties = new PopularMoviesAppProperties(this, R.raw.app_config);
+            mApplicationProperties = new PopularMoviesAppProperties(this);
         } catch (IOException ex) {
             // TODO: What is a better way of handling an unrecoverable event during application initialization?
             throw new RuntimeException(
-                    "Failed to construct application properties from resource ID " + R.raw.app_config,
-                    ex);
+                    "Failed to construct application properties.", ex);
         }
 
         final String tmdbAPIKey = mApplicationProperties.getStringPropertyValue(
@@ -63,7 +62,7 @@ public class PopularMoviesApplication extends Application {
      * An extension of {@link ApplicationProperties} that enforces (via static typing) that only
      * keys of type {@link PropertyKey} can be read.
      */
-    private static class PopularMoviesAppProperties extends ApplicationProperties {
+    private static class PopularMoviesAppProperties {
 
         /**
          * All possible property key names for the Popular Movies app.
@@ -72,15 +71,16 @@ public class PopularMoviesApplication extends Application {
             TMDB_API_KEY;
         }
 
-        public PopularMoviesAppProperties(final Context context, final int configFileId)
-                throws IOException {
-            super(context, configFileId);
+        private final ApplicationProperties mApplicationProperties;
+
+        public PopularMoviesAppProperties(final Context context) throws IOException {
+            mApplicationProperties = new ApplicationProperties(context, R.raw.app_config);
         }
 
         public String getStringPropertyValue(final PropertyKey key) {
 
             Preconditions.checkNotNull(key, "key must not be null.");
-            return super.getStringPropertyValue(key.name());
+            return mApplicationProperties.getStringPropertyValue(key.name());
         }
     }
 }
