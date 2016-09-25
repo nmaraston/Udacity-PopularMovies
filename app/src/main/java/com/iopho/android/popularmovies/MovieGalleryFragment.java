@@ -153,7 +153,6 @@ public class MovieGalleryFragment extends Fragment {
     }
 
     private void updateMoviesList(final TMDBQueryType tmdbQueryTypeFetchParam) {
-        mProgressDialog.show();
         final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(tmdbQueryTypeFetchParam);
         fetchMoviesTask.execute();
     }
@@ -181,6 +180,11 @@ public class MovieGalleryFragment extends Fragment {
 
             Preconditions.checkNotNull(tmdbQueryTypeFetchParam, "queryTypes must not be null.");
             this.mTMDBQueryTypeFetchParam = tmdbQueryTypeFetchParam;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog.show();
         }
 
         @Override
