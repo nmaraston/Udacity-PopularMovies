@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.tmdb.TMDBMovieClient;
@@ -31,16 +32,29 @@ public class MovieGalleryFragment extends Fragment {
     private static final String LOG_TAG = MovieGalleryFragment.class.getSimpleName();
 
     private static final String MOVIES_BUNDLE_KEY = "MOVIES";
+    private static final String QUERY_TYPE_BUNDLE_KEY = "QUERY_TYPE";
+
+    private enum TMDBQueryType {
+        POPULARITY,
+        RATING;
+
+        public static TMDBQueryType getQueryTypeForName(final String name) {
+            if (POPULARITY.name().equals(name)) {
+                return POPULARITY;
+            }
+            return RATING;
+        }
+    }
 
     private TMDBClientFactory mTMDBClientFactory;
     private MovieGalleryArrayAdapter mMovieGalleryArrayAdapter;
-    private GridView mMovieGridView;
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
+    private TMDBQueryType mTMDBQueryType;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         final PopularMoviesApplication app =
                 (PopularMoviesApplication)getActivity().getApplicationContext();
@@ -60,7 +74,8 @@ public class MovieGalleryFragment extends Fragment {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                updateMoviesList();
+                                final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
+                                updateMoviesList(queryTypePref);
                             }
                         })
                 .setNegativeButton(getString(R.string.movie_gallery_alert_dialog_cancel_action),
@@ -71,10 +86,21 @@ public class MovieGalleryFragment extends Fragment {
                             }
                         });
         mAlertDialog = alertDialogBuilder.create();
+    }
 
-        List<Movie> movies = new ArrayList<>();
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+
+        // Load saved Movies instance and query type state if exists
+        List<Movie> movies;
         if (savedInstanceState != null) {
             movies = savedInstanceState.getParcelableArrayList(MOVIES_BUNDLE_KEY);
+            mTMDBQueryType = TMDBQueryType.getQueryTypeForName(
+                    savedInstanceState.getString(QUERY_TYPE_BUNDLE_KEY));
+        } else {
+            movies = new ArrayList<>();
+            mTMDBQueryType = getQueryTypeForSortOrderPreference();
         }
 
         // Create movie array adapter
@@ -86,8 +112,8 @@ public class MovieGalleryFragment extends Fragment {
                 R.layout.fragment_movie_gallery, container, false);
 
         // Setup the Movie GridView
-        mMovieGridView = (GridView)rootView.findViewById(R.id.movie_gridview);
-        mMovieGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        final GridView gridView = (GridView)rootView.findViewById(R.id.movie_gridview);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 final Movie selectedMovie = mMovieGalleryArrayAdapter.getItem(position);
@@ -96,7 +122,7 @@ public class MovieGalleryFragment extends Fragment {
                 startActivity(detailIntent);
             }
         });
-        mMovieGridView.setAdapter(mMovieGalleryArrayAdapter);
+        gridView.setAdapter(mMovieGalleryArrayAdapter);
 
         return rootView;
     }
@@ -109,6 +135,7 @@ public class MovieGalleryFragment extends Fragment {
             movies.add(mMovieGalleryArrayAdapter.getItem(i));
         }
         savedInstanceState.putParcelableArrayList(MOVIES_BUNDLE_KEY, movies);
+        savedInstanceState.putString(QUERY_TYPE_BUNDLE_KEY, mTMDBQueryType.name());
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -116,18 +143,45 @@ public class MovieGalleryFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (mMovieGalleryArrayAdapter.isEmpty()) {
-            updateMoviesList();
+        final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
+
+        // If the array adapter is empty or the current query type does not match the sort order
+        // preference, update movie data.
+        if (mMovieGalleryArrayAdapter.isEmpty() || queryTypePref != mTMDBQueryType) {
+            updateMoviesList(queryTypePref);
         }
     }
 
-    private void updateMoviesList() {
+    private void updateMoviesList(final TMDBQueryType tmdbQueryTypeFetchParam) {
         mProgressDialog.show();
-        final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
+        final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(tmdbQueryTypeFetchParam);
         fetchMoviesTask.execute();
     }
 
+    private TMDBQueryType getQueryTypeForSortOrderPreference() {
+
+        final SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String sortOrderPref = sharedPreferences.getString(
+                getString(R.string.pref_sort_order_key),
+                getString(R.string.pref_sort_order_default));
+
+        if (getString(R.string.pref_sort_order_value_rating).equals(sortOrderPref)) {
+            return TMDBQueryType.RATING;
+        } else {
+            return TMDBQueryType.POPULARITY;
+        }
+    }
+
     private class FetchMoviesTask extends AsyncTask<Void, Void, DataPage<Movie>> {
+
+        private final TMDBQueryType mTMDBQueryTypeFetchParam;
+
+        public FetchMoviesTask(final TMDBQueryType tmdbQueryTypeFetchParam) {
+
+            Preconditions.checkNotNull(tmdbQueryTypeFetchParam, "queryTypes must not be null.");
+            this.mTMDBQueryTypeFetchParam = tmdbQueryTypeFetchParam;
+        }
 
         @Override
         protected void onPostExecute(final DataPage<Movie> moviesPage) {
@@ -136,6 +190,7 @@ public class MovieGalleryFragment extends Fragment {
                 for (Movie movie : moviesPage.getResults()) {
                     mMovieGalleryArrayAdapter.add(movie);
                 }
+                mTMDBQueryType = mTMDBQueryTypeFetchParam;
             } else {
                 mAlertDialog.show();
             }
@@ -149,13 +204,7 @@ public class MovieGalleryFragment extends Fragment {
             try {
                 final TMDBMovieClient tmdbMovieClient = mTMDBClientFactory.getTMDBMovieClient();
 
-                final SharedPreferences sharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(getActivity());
-                final String sortOrderPref = sharedPreferences.getString(
-                        getString(R.string.pref_sort_order_key),
-                        getString(R.string.pref_sort_order_default));
-
-                if (getString(R.string.pref_sort_order_value_rating).equals(sortOrderPref)) {
+                if (mTMDBQueryTypeFetchParam == TMDBQueryType.RATING) {
                     return tmdbMovieClient.getTopRatedMovies(1);
                 } else {
                     return tmdbMovieClient.getPopularMovies(1);
