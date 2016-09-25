@@ -67,25 +67,7 @@ public class MovieGalleryFragment extends Fragment {
         mProgressDialog.setMessage(getString(R.string.movie_gallery_loading_dialog_description));
 
         // Create alert dialog
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity())
-                .setTitle(getString(R.string.movie_gallery_alert_dialog_title))
-                .setMessage(getString(R.string.movie_gallery_alert_dialog_message))
-                .setPositiveButton(getString(R.string.movie_gallery_alert_dialog_retry_action),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
-                                updateMoviesList(queryTypePref);
-                            }
-                        })
-                .setNegativeButton(getString(R.string.movie_gallery_alert_dialog_cancel_action),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // Do nothing
-                            }
-                        });
-        mAlertDialog = alertDialogBuilder.create();
+        mAlertDialog = createNetworkErrorAlertDialog();
     }
 
     @Override
@@ -155,6 +137,33 @@ public class MovieGalleryFragment extends Fragment {
     private void updateMoviesList(final TMDBQueryType tmdbQueryTypeFetchParam) {
         final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(tmdbQueryTypeFetchParam);
         fetchMoviesTask.execute();
+    }
+
+    private AlertDialog createNetworkErrorAlertDialog() {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.movie_gallery_alert_dialog_title))
+                .setMessage(getString(R.string.movie_gallery_alert_dialog_message))
+                .setPositiveButton(getString(R.string.movie_gallery_alert_dialog_retry_action),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // Re-fetch movie data
+                                final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
+                                updateMoviesList(queryTypePref);
+                            }
+                        })
+                .setNegativeButton(getString(R.string.movie_gallery_alert_dialog_cancel_action),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // Re-direct to home screen
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_HOME);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
+        return alertDialogBuilder.create();
     }
 
     private TMDBQueryType getQueryTypeForSortOrderPreference() {
