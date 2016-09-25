@@ -146,7 +146,7 @@ class TMDBConfigurationCacheManager {
             throws IOException, DataAccessParsingException {
 
         final String configurationContents = IOHelper.readResourceToString(
-                mContext, R.raw.tmdb_default_config);
+                mContext, R.raw.tmdb_default_remote_config);
         return parseConfiguration(configurationContents);
     }
 
