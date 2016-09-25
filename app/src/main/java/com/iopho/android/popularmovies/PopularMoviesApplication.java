@@ -2,7 +2,6 @@ package com.iopho.android.popularmovies;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
@@ -27,11 +26,11 @@ public class PopularMoviesApplication extends Application {
         super.onCreate();
 
         try {
-            mApplicationProperties = new PopularMoviesAppProperties(this, R.raw.config);
+            mApplicationProperties = new PopularMoviesAppProperties(this, R.raw.app_config);
         } catch (IOException ex) {
             // TODO: What is a better way of handling an unrecoverable event during application initialization?
             throw new RuntimeException(
-                    "Failed to construct application properties from resource ID " + R.raw.config,
+                    "Failed to construct application properties from resource ID " + R.raw.app_config,
                     ex);
         }
 
