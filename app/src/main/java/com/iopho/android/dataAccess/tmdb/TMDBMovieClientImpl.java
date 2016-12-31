@@ -83,8 +83,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
 
         try  {
 
-            final URL url = new TMDBURLBuilder(
-                    mTMDBBaseURL, mAPIKey, endpoint)
+            final URL url = new TMDBURLBuilder(mTMDBBaseURL, mAPIKey, endpoint)
                     .withQueryParam(TMDBURLBuilder.QueryParamKey.PAGE, String.valueOf(pageNumber))
                     .build();
 

@@ -18,7 +18,6 @@ import java.io.IOException;
  */
 public class TMDBClientFactory {
 
-
     private final Context mContext;
     private final String mAPIKey;
 

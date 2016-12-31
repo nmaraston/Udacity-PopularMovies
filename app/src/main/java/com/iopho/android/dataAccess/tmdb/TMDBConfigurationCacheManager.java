@@ -35,8 +35,6 @@ class TMDBConfigurationCacheManager {
 
     private static final String LOG_TAG = TMDBConfigurationCacheManager.class.getSimpleName();
 
-
-
     private final Context mContext;
     private final TMDBConfigurationClient mTMDBConfigurationClient;
     private final JSONConfigurationTransformer mJSONConfigurationTransformer;
@@ -91,10 +89,11 @@ class TMDBConfigurationCacheManager {
      * {@link #getTMDBConfiguration()} to retrieve the cache.
      *
      * Configuration is provided by TMDB Web Service and cached. On init, we attempt to load
-     * configuration from the file local cache. If it does not exist or is stale we load
+     * configuration from the local file cache. If it does not exist or is stale we load
      * configuration from a default static file and kick off an async worker to fetch and cache the
      * latest config. Temporarily providing default config from a local file ensures this method
-     * does not require network IO and can be called from the UI thread.
+     * does not require blocking network IO on the current thread and can be called from the UI
+     * thread.
      *
      * @throws DataAccessParsingException when failing to parse a TMDB configuration payload
      * @throws IOException when failing to read configuration from a locally persisted file cache
