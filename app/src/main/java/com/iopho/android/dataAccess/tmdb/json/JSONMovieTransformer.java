@@ -18,31 +18,21 @@ import java.util.Date;
  */
 public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
 
-    private enum JSON_KEY {
-        POSTER_PATH        ("poster_path"),
-        ADULT              ("adult"),
-        OVERVIEW           ("overview"),
-        RELEASE_DATE       ("release_date"),
-        GENRE_IDS          ("genre_ids"),
-        ID                 ("id"),
-        ORIGINAL_TITLE     ("original_title"),
-        ORIGINAL_LANGUAGE  ("original_language"),
-        TITLE              ("title"),
-        BACKDROP_PATH      ("backdrop_path"),
-        POPULARITY         ("popularity"),
-        VOTE_COUNT         ("vote_count"),
-        VIDEO              ("video"),
-        VOTE_AVERAGE       ("vote_average");
-
-        private final String mKeyName;
-
-        JSON_KEY(final String keyName) {
-            this.mKeyName = keyName;
-        }
-
-        public String getKeyName() {
-            return mKeyName;
-        }
+    private static class JSON_KEY {
+        public static final String POSTER_PATH       = "poster_path";
+        public static final String ADULT             = "adult";
+        public static final String OVERVIEW          = "overview";
+        public static final String RELEASE_DATE      = "release_date";
+        public static final String GENRE_IDS         = "genre_ids";
+        public static final String ID                = "id";
+        public static final String ORIGINAL_TITLE    = "original_title";
+        public static final String ORIGINAL_LANGUAGE = "original_language";
+        public static final String TITLE             = "title";
+        public static final String BACKDROP_PATH     = "backdrop_path";
+        public static final String POPULARITY        = "popularity";
+        public static final String VOTE_COUNT        = "vote_count";
+        public static final String VIDEO             = "video";
+        public static final String VOTE_AVERAGE      = "vote_average";
     }
 
     private static final String TMDB_MOVIE_DATE_FORMAT = "yyyy-MM-dd";
@@ -60,18 +50,18 @@ public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
 
         Preconditions.checkNotNull(jsonObject, "jsonObject must not be null.");
 
-        final String posterPath = jsonObject.getString(JSON_KEY.POSTER_PATH.getKeyName());
-        final boolean isAdult = jsonObject.getBoolean(JSON_KEY.ADULT.getKeyName());
-        final String overview = jsonObject.getString(JSON_KEY.OVERVIEW.getKeyName());
-        final long id = jsonObject.getLong(JSON_KEY.ID.getKeyName());
-        final String originalTitle = jsonObject.getString(JSON_KEY.ORIGINAL_TITLE.getKeyName());
-        final String originalLanguage = jsonObject.getString(JSON_KEY.ORIGINAL_LANGUAGE.getKeyName());
-        final String title = jsonObject.getString(JSON_KEY.TITLE.getKeyName());
-        final String backdropPath = jsonObject.getString(JSON_KEY.BACKDROP_PATH.getKeyName());
-        final double popularity = jsonObject.getDouble(JSON_KEY.POPULARITY.getKeyName());
-        final long voteCount = jsonObject.getLong(JSON_KEY.VOTE_COUNT.getKeyName());
-        final boolean hasVideo = jsonObject.getBoolean(JSON_KEY.VIDEO.getKeyName());
-        final double averageVote = jsonObject.getDouble(JSON_KEY.VOTE_AVERAGE.getKeyName());
+        final String posterPath = jsonObject.getString(JSON_KEY.POSTER_PATH);
+        final boolean isAdult = jsonObject.getBoolean(JSON_KEY.ADULT);
+        final String overview = jsonObject.getString(JSON_KEY.OVERVIEW);
+        final long id = jsonObject.getLong(JSON_KEY.ID);
+        final String originalTitle = jsonObject.getString(JSON_KEY.ORIGINAL_TITLE);
+        final String originalLanguage = jsonObject.getString(JSON_KEY.ORIGINAL_LANGUAGE);
+        final String title = jsonObject.getString(JSON_KEY.TITLE);
+        final String backdropPath = jsonObject.getString(JSON_KEY.BACKDROP_PATH);
+        final double popularity = jsonObject.getDouble(JSON_KEY.POPULARITY);
+        final long voteCount = jsonObject.getLong(JSON_KEY.VOTE_COUNT);
+        final boolean hasVideo = jsonObject.getBoolean(JSON_KEY.VIDEO);
+        final double averageVote = jsonObject.getDouble(JSON_KEY.VOTE_AVERAGE);
 
         final Date releaseDate = parseReleaseDate(jsonObject);
         final long[] genreIDs = parseGenreIDs(jsonObject);
@@ -95,7 +85,7 @@ public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
     private Date parseReleaseDate(final JSONObject jsonObject)
             throws JSONException, ParseException {
 
-        final String releaseDateStr = jsonObject.getString(JSON_KEY.RELEASE_DATE.getKeyName());
+        final String releaseDateStr = jsonObject.getString(JSON_KEY.RELEASE_DATE);
         final DateFormat dateFormat = new SimpleDateFormat(TMDB_MOVIE_DATE_FORMAT);
 
         return dateFormat.parse(releaseDateStr);
@@ -112,7 +102,7 @@ public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
      */
     private long[] parseGenreIDs(final JSONObject jsonObject) throws JSONException {
 
-        final JSONArray jsonArray = jsonObject.getJSONArray(JSON_KEY.GENRE_IDS.getKeyName());
+        final JSONArray jsonArray = jsonObject.getJSONArray(JSON_KEY.GENRE_IDS);
         final long[] genreIDs = new long[jsonArray.length()];
         for (int i = 0; i < jsonArray.length(); i++) {
             genreIDs[i] = jsonArray.getLong(i);

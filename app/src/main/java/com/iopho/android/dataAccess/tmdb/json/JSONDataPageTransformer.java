@@ -19,22 +19,11 @@ import java.util.List;
  */
 public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataPage<T>> {
 
-    private enum JSON_KEY {
-
-        PAGE           ("page"),
-        TOTAL_PAGES    ("total_pages"),
-        RESULTS        ("results"),
-        TOTAL_RESULTS  ("total_results");
-
-        private final String mKeyName;
-
-        JSON_KEY(final String keyName) {
-            this.mKeyName = keyName;
-        }
-
-        public String getKeyName() {
-            return mKeyName;
-        }
+    private static class JSON_KEY {
+        public static final String PAGE          = "page";
+        public static final String TOTAL_PAGES   = "total_pages";
+        public static final String RESULTS       = "results";
+        public static final String TOTAL_RESULTS = "total_results";
     }
 
     private final JSONToObjectTransformer<T> resultJSONToObjectTransformer;
@@ -59,11 +48,11 @@ public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataP
 
         Preconditions.checkNotNull(jsonObject, "jsonObject must not be null.");
 
-        final int pageNumber = jsonObject.getInt(JSON_KEY.PAGE.getKeyName());
-        final int totalPageCount = jsonObject.getInt(JSON_KEY.TOTAL_PAGES.getKeyName());
-        final int totalResultCount = jsonObject.getInt(JSON_KEY.TOTAL_RESULTS.getKeyName());
+        final int pageNumber = jsonObject.getInt(JSON_KEY.PAGE);
+        final int totalPageCount = jsonObject.getInt(JSON_KEY.TOTAL_PAGES);
+        final int totalResultCount = jsonObject.getInt(JSON_KEY.TOTAL_RESULTS);
 
-        final JSONArray resultsJSONArray = jsonObject.getJSONArray(JSON_KEY.RESULTS.getKeyName());
+        final JSONArray resultsJSONArray = jsonObject.getJSONArray(JSON_KEY.RESULTS);
         final List<T> resultList = new ArrayList<>(resultsJSONArray.length());
 
         for (int i = 0; i < resultsJSONArray.length(); i++) {

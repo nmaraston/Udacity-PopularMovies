@@ -2,6 +2,7 @@ package com.iopho.android.popularmovies;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.StringDef;
 
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
@@ -10,6 +11,8 @@ import com.iopho.android.util.ApplicationProperties;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * The PopularMoviesApplication class maintains global application state for the PopularMovies app.
@@ -34,7 +37,7 @@ public class PopularMoviesApplication extends Application {
         }
 
         final String tmdbAPIKey = mApplicationProperties.getStringPropertyValue(
-                PopularMoviesAppProperties.PropertyKey.TMDB_API_KEY);
+                PopularMoviesAppProperties.TMDB_API_KEY);
 
         mTMDBClientFactory = new TMDBClientFactory(this, tmdbAPIKey);
 
@@ -60,16 +63,18 @@ public class PopularMoviesApplication extends Application {
 
     /**
      * An extension of {@link ApplicationProperties} that enforces (via static typing) that only
-     * keys of type {@link PropertyKey} can be read.
+     * keys of annotated type @AppProperty can be read.
      */
     private static class PopularMoviesAppProperties {
 
         /**
          * All possible property key names for the Popular Movies app.
          */
-        public enum PropertyKey {
-            TMDB_API_KEY;
-        }
+        public static final String TMDB_API_KEY = "TMDB_API_KEY";
+
+        @Retention(RetentionPolicy.SOURCE)
+        @StringDef({TMDB_API_KEY})
+        public @interface AppProperty {}
 
         private final ApplicationProperties mApplicationProperties;
 
@@ -77,10 +82,10 @@ public class PopularMoviesApplication extends Application {
             mApplicationProperties = new ApplicationProperties(context, R.raw.app_config);
         }
 
-        public String getStringPropertyValue(final PropertyKey key) {
+        public String getStringPropertyValue(final @AppProperty String key) {
 
             Preconditions.checkNotNull(key, "key must not be null.");
-            return mApplicationProperties.getStringPropertyValue(key.name());
+            return mApplicationProperties.getStringPropertyValue(key);
         }
     }
 }

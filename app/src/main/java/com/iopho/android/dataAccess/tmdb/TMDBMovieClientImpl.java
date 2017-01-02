@@ -61,7 +61,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
         Preconditions.checkArgument(pageNumber >= 1 && pageNumber <= 1000,
                 "pageNumber must be in range [1, 1000].");
 
-        return queryTMDBMovies(TMDBURLBuilder.EndPoint.MOVIES_TOP_RATED, pageNumber);
+        return queryTMDBMovies(TMDBURLBuilder.Endpoint.MOVIES_TOP_RATED, pageNumber);
     }
 
     /**
@@ -74,10 +74,10 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
         Preconditions.checkArgument(pageNumber >= 1 && pageNumber <= 1000,
                 "pageNumber must be in range [1, 1000].");
 
-        return queryTMDBMovies(TMDBURLBuilder.EndPoint.MOVIES_POPULAR, pageNumber);
+        return queryTMDBMovies(TMDBURLBuilder.Endpoint.MOVIES_POPULAR, pageNumber);
     }
 
-    private DataPage<Movie> queryTMDBMovies(final TMDBURLBuilder.EndPoint endpoint,
+    private DataPage<Movie> queryTMDBMovies(final @TMDBURLBuilder.Endpoint.Def String endpoint,
                                             final int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException  {
 

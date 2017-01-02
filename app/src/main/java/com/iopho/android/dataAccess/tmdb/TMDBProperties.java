@@ -9,13 +9,14 @@ import java.io.IOException;
 
 class TMDBProperties {
 
-    private enum Property {
-        BASE_URL,
-        REMOTE_CONFIG_CACHE_FILE_NAME,
-        REMOTE_CONFIG_CACHE_TTL_DAYS,
-        HTTP_CONNECT_TIMEOUT,
-        HTTP_READ_TIMEOUT
+    private static class Property {
+        private static final String BASE_URL                      = "BASE_URL";
+        private static final String REMOTE_CONFIG_CACHE_FILE_NAME = "REMOTE_CONFIG_CACHE_FILE_NAME";
+        private static final String REMOTE_CONFIG_CACHE_TTL_DAYS  = "REMOTE_CONFIG_CACHE_TTL_DAYS";
+        private static final String HTTP_CONNECT_TIMEOUT          = "HTTP_CONNECT_TIMEOUT";
+        private static final String HTTP_READ_TIMEOUT             = "HTTP_READ_TIMEOUT";
     }
+
 
     private final ApplicationProperties mApplicationProperties;
 
@@ -33,7 +34,7 @@ class TMDBProperties {
      * @return the TMDB Web Service base URL.
      */
     public String getBaseURL() {
-        return mApplicationProperties.getStringPropertyValue(Property.BASE_URL.name());
+        return mApplicationProperties.getStringPropertyValue(Property.BASE_URL);
     }
 
     /**
@@ -41,7 +42,7 @@ class TMDBProperties {
      */
     public String getRemoteConfigCacheFileName() {
         return mApplicationProperties.getStringPropertyValue(
-                Property.REMOTE_CONFIG_CACHE_FILE_NAME.name());
+                Property.REMOTE_CONFIG_CACHE_FILE_NAME);
     }
 
     /**
@@ -51,8 +52,7 @@ class TMDBProperties {
      * @return the TMDB remote configuration cache TTL.
      */
     public int getRemoteConfigCacheTTLDays() {
-        return mApplicationProperties.getIntPropertyValue(
-                Property.REMOTE_CONFIG_CACHE_TTL_DAYS.name());
+        return mApplicationProperties.getIntPropertyValue(Property.REMOTE_CONFIG_CACHE_TTL_DAYS);
     }
 
     /**
@@ -62,8 +62,7 @@ class TMDBProperties {
      * @return HTTP connect timeout. 0 indicates an infinite timeout.
      */
     public int getHTTPConnectTimeout() {
-        return mApplicationProperties.getIntPropertyValue(
-                Property.HTTP_CONNECT_TIMEOUT.name());
+        return mApplicationProperties.getIntPropertyValue(Property.HTTP_CONNECT_TIMEOUT);
     }
 
     /**
@@ -73,7 +72,6 @@ class TMDBProperties {
      * @return HTTP read timeout. 0 indicates an infinite timeout.
      */
     public int getHTTPReadTimeout() {
-        return mApplicationProperties.getIntPropertyValue(
-                Property.HTTP_READ_TIMEOUT.name());
+        return mApplicationProperties.getIntPropertyValue(Property.HTTP_READ_TIMEOUT);
     }
 }

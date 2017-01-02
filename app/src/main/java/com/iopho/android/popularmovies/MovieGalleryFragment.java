@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,8 @@ import com.iopho.android.dataAccess.tmdb.TMDBClientFactory;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,15 +37,18 @@ public class MovieGalleryFragment extends Fragment {
     private static final String MOVIES_BUNDLE_KEY = "MOVIES";
     private static final String QUERY_TYPE_BUNDLE_KEY = "QUERY_TYPE";
 
-    private enum TMDBQueryType {
-        POPULARITY,
-        RATING;
+    private static class TMDBQueryType {
 
-        public static TMDBQueryType getQueryTypeForName(final String name) {
-            if (POPULARITY.name().equals(name)) {
-                return POPULARITY;
-            }
-            return RATING;
+        private static final int POPULARITY = 0;
+        private static final int RATING = 1;
+
+        @Retention(RetentionPolicy.SOURCE)
+        @IntDef({POPULARITY, RATING})
+        public @interface Def {}
+
+        private static @Def int getTMDBQueryTypeForInt(final int queryType) {
+            // Default to POPULARITY on unknown type
+            return (queryType == RATING) ? RATING : POPULARITY;
         }
     }
 
@@ -50,7 +56,7 @@ public class MovieGalleryFragment extends Fragment {
     private MovieGalleryArrayAdapter mMovieGalleryArrayAdapter;
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
-    private TMDBQueryType mTMDBQueryType;
+    private @TMDBQueryType.Def int mTMDBQueryType;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -78,8 +84,8 @@ public class MovieGalleryFragment extends Fragment {
         List<Movie> movies;
         if (savedInstanceState != null) {
             movies = savedInstanceState.getParcelableArrayList(MOVIES_BUNDLE_KEY);
-            mTMDBQueryType = TMDBQueryType.getQueryTypeForName(
-                    savedInstanceState.getString(QUERY_TYPE_BUNDLE_KEY));
+            mTMDBQueryType = TMDBQueryType.getTMDBQueryTypeForInt(
+                    savedInstanceState.getInt(QUERY_TYPE_BUNDLE_KEY));
         } else {
             movies = new ArrayList<>();
             mTMDBQueryType = getQueryTypeForSortOrderPreference();
@@ -117,7 +123,7 @@ public class MovieGalleryFragment extends Fragment {
             movies.add(mMovieGalleryArrayAdapter.getItem(i));
         }
         savedInstanceState.putParcelableArrayList(MOVIES_BUNDLE_KEY, movies);
-        savedInstanceState.putString(QUERY_TYPE_BUNDLE_KEY, mTMDBQueryType.name());
+        savedInstanceState.putInt(QUERY_TYPE_BUNDLE_KEY, mTMDBQueryType);
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -125,7 +131,7 @@ public class MovieGalleryFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
+        final @TMDBQueryType.Def int queryTypePref = getQueryTypeForSortOrderPreference();
 
         // If the array adapter is empty or the current query type does not match the sort order
         // preference, update movie data.
@@ -134,7 +140,7 @@ public class MovieGalleryFragment extends Fragment {
         }
     }
 
-    private void updateMoviesList(final TMDBQueryType tmdbQueryTypeFetchParam) {
+    private void updateMoviesList(final @TMDBQueryType.Def int tmdbQueryTypeFetchParam) {
         final FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(tmdbQueryTypeFetchParam);
         fetchMoviesTask.execute();
     }
@@ -148,7 +154,8 @@ public class MovieGalleryFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // Re-fetch movie data
-                                final TMDBQueryType queryTypePref = getQueryTypeForSortOrderPreference();
+                                final @TMDBQueryType.Def int queryTypePref =
+                                        getQueryTypeForSortOrderPreference();
                                 updateMoviesList(queryTypePref);
                             }
                         })
@@ -166,7 +173,7 @@ public class MovieGalleryFragment extends Fragment {
         return alertDialogBuilder.create();
     }
 
-    private TMDBQueryType getQueryTypeForSortOrderPreference() {
+    private @TMDBQueryType.Def int getQueryTypeForSortOrderPreference() {
 
         final SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -183,9 +190,9 @@ public class MovieGalleryFragment extends Fragment {
 
     private class FetchMoviesTask extends AsyncTask<Void, Void, DataPage<Movie>> {
 
-        private final TMDBQueryType mTMDBQueryTypeFetchParam;
+        private final @TMDBQueryType.Def int mTMDBQueryTypeFetchParam;
 
-        public FetchMoviesTask(final TMDBQueryType tmdbQueryTypeFetchParam) {
+        public FetchMoviesTask(final @TMDBQueryType.Def int tmdbQueryTypeFetchParam) {
 
             Preconditions.checkNotNull(tmdbQueryTypeFetchParam, "queryTypes must not be null.");
             this.mTMDBQueryTypeFetchParam = tmdbQueryTypeFetchParam;

@@ -66,7 +66,7 @@ class TMDBConfigurationClient {
         try  {
 
             final URL url = new TMDBURLBuilder(
-                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.EndPoint.CONFIGURATION)
+                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.Endpoint.CONFIGURATION)
                     .build();
 
             Log.d(LOG_TAG, "Attempting to download content at URI: " + url.toString());
