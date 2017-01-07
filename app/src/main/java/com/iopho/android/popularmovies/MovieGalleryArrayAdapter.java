@@ -44,15 +44,28 @@ public class MovieGalleryArrayAdapter extends ArrayAdapter<Movie> {
         if (resultView == null) {
             resultView = LayoutInflater.from(getContext()).inflate(
                     R.layout.grid_item_movie_poster, parent, false);
+            resultView.setTag(new ViewHolder(resultView));
         }
 
-        ImageView imageView = (ImageView)resultView.findViewById(R.id.movie_image_view);
+        final ViewHolder viewHolder = (ViewHolder)resultView.getTag();
+        if (viewHolder == null) {
+            throw new IllegalStateException(
+                    "convertView.getTag() did not return expected ViewHolder.");
+        }
 
         Picasso.with(getContext())
                 .load(mTMDBAssetURLFactory.getPosterImageURL(
                         movie.getPosterPath(), ImageSize.W_185))
-                .into(imageView);
+                .into(viewHolder.moviePosterImageView);
 
-        return imageView;
+        return resultView;
+    }
+
+    private static class ViewHolder {
+        public final ImageView moviePosterImageView;
+
+        public ViewHolder(final View view) {
+            moviePosterImageView = (ImageView)view.findViewById(R.id.movie_image_view);
+        }
     }
 }
