@@ -6,6 +6,7 @@
         android:title="@string/pref_sort_order_label"
         android:summary="@string/pref_sort_order_summary"
         android:entries="@array/pref_sort_order_entries"
-        android:entryValues="@array/pref_sort_order_values"/>
+        android:entryValues="@array/pref_sort_order_values"
+        android:defaultValue="@string/pref_sort_order_value_rating" />
 
 </PreferenceScreen>
