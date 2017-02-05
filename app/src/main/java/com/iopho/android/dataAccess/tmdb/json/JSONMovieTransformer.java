@@ -40,10 +40,6 @@ public class JSONMovieTransformer implements JSONToObjectTransformer<Movie> {
 
     /**
      * @see {@link JSONToObjectTransformer#transform(JSONObject)}
-     *
-     * @throws JSONException when an error occurs when attempting to read a key's value or a
-     *                       required key is missing.
-     * @throws ParseException
      */
     @Override
     public Movie transform(final JSONObject jsonObject) throws JSONException, ParseException {

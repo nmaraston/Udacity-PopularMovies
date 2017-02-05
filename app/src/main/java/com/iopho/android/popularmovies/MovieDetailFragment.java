@@ -18,12 +18,21 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- *
- */
 public class MovieDetailFragment extends Fragment {
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
+
+    private TMDBAssetURLFactory mTMDBAssetURLFactory;
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        final PopularMoviesApplication app =
+                (PopularMoviesApplication)getActivity().getApplicationContext();
+
+        mTMDBAssetURLFactory = app.getTMDBClientFactory().getTMDBAssetURLFactory();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,11 +46,6 @@ public class MovieDetailFragment extends Fragment {
         if (intent == null || !intent.hasExtra(MovieDetailActivity.MOVIE_INTENT_EXTRA)) {
             return rootView;
         }
-
-        final PopularMoviesApplication app =
-                (PopularMoviesApplication) getActivity().getApplicationContext();
-        final TMDBAssetURLFactory tmdbAssetURLFactory =
-                app.getTMDBClientFactory().getTMDBAssetURLFactory();
 
         final Movie movie = intent.getParcelableExtra(MovieDetailActivity.MOVIE_INTENT_EXTRA);
 
@@ -62,7 +66,7 @@ public class MovieDetailFragment extends Fragment {
         movieOverviewTextView.setText(movie.getOverview());
 
         Picasso.with(getContext())
-                .load(tmdbAssetURLFactory.getPosterImageURL(movie.getPosterPath(), ImageSize.W_342))
+                .load(mTMDBAssetURLFactory.getPosterImageURL(movie.getPosterPath(), ImageSize.W_342))
                 .into(moviePosterImageView);
 
         return rootView;

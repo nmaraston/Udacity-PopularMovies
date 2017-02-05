@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A JSONDataPageTransformer is an implementation of a {@link JSONToObjectTransformer}. It transforms
- * a given JSONObject into a {@link DataPage}.
+ * A JSONDataPageTransformer is an implementation of a {@link JSONToObjectTransformer}. It
+ * transforms a given JSONObject into a {@link DataPage}.
  *
  * @param <T> the type of Object contained in the DataPage being transformed to.
  */
@@ -48,9 +48,14 @@ public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataP
 
         Preconditions.checkNotNull(jsonObject, "jsonObject must not be null.");
 
-        final int pageNumber = jsonObject.getInt(JSON_KEY.PAGE);
         final int totalPageCount = jsonObject.getInt(JSON_KEY.TOTAL_PAGES);
         final int totalResultCount = jsonObject.getInt(JSON_KEY.TOTAL_RESULTS);
+
+        // The TMDB API will simply return the page number that is passed in as an argument.
+        // Then, in the case where no pages are present and we request the first page, TMDB will
+        // respond with page=1, total_pages=0. To not allow this poor state, we manually set the
+        // page number to 0 here.
+        final int pageNumber = (totalPageCount == 0) ? 0 : jsonObject.getInt(JSON_KEY.PAGE);
 
         final JSONArray resultsJSONArray = jsonObject.getJSONArray(JSON_KEY.RESULTS);
         final List<T> resultList = new ArrayList<>(resultsJSONArray.length());

@@ -138,6 +138,7 @@ public class FetchMoviesAsyncTask extends AsyncTask<Integer, Void, DataPage<Movi
             } else {
                 return tmdbMovieClient.getPopularMovies(1);
             }
+
         } catch (DataAccessRequestException | DataAccessParsingException ex) {
             Log.e(LOG_TAG, "Failed to request top rated movies from TMDB.", ex);
         }

@@ -4,6 +4,7 @@ import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
+import com.iopho.android.dataAccess.tmdb.model.Review;
 
 /**
  * A TMDB (The Movie Database) client.
@@ -37,5 +38,18 @@ public interface TMDBMovieClient {
      * @throws DataAccessParsingException when unable to parse the TMDB response.
      */
     DataPage<Movie> getPopularMovies(int pageNumber)
+            throws DataAccessRequestException, DataAccessParsingException;
+
+    /**
+     * Queries TMDB to retrieve a page of Reviews for a Movie identified by a given ID.
+     *
+     * @param movieId the unique TMDB identifier of the movie to query reviews for.
+     * @param pageNumber page number of movies to return. Must be in range: [1, 1000].
+     * @return a {@link DataPage} of {@link Review}s.
+     * @throws DataAccessRequestException when unable to query TMDB. This can occur for various
+     * reasons. The Exception cause is stored.
+     * @throws DataAccessParsingException when unable to parse the TMDB response.
+     */
+    DataPage<Review> getMovieReviews(long movieId, int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException;
 }

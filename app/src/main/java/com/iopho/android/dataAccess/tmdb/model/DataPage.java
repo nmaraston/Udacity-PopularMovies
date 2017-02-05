@@ -34,8 +34,8 @@ public class DataPage<T> {
                     final int totalResultCount,
                     final List<T> results) {
 
-        Preconditions.checkArgument(pageNumber >= 1, "pageNumber should be positive.");
-        Preconditions.checkArgument(totalPageCount >=1, "totalPageCount should be positive.");
+        Preconditions.checkArgument(pageNumber >= 0, "pageNumber should be non-negative.");
+        Preconditions.checkArgument(totalPageCount >= 0, "totalPageCount should be positive.");
         Preconditions.checkArgument(pageNumber <= totalPageCount,
                 "pageNumber must be less than or equal to totalPageCount");
         Preconditions.checkArgument(totalResultCount >= 0,

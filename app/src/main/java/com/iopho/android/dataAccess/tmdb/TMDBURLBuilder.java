@@ -17,6 +17,8 @@ import java.util.Map;
  */
 class TMDBURLBuilder {
 
+    private static final String ENDPOINT_RECORD_ID_PARAM = "[%id]";
+
     /**
      * Type safe constants of possible TMDB API endpoints used to interact with different resources.
      */
@@ -27,8 +29,10 @@ class TMDBURLBuilder {
         public static final String MOVIES_POPULAR   = "movie/popular";
         public static final String MOVIES_TOP_RATED = "movie/top_rated";
 
+        public static final String MOVIE_REVIEWS = "movie/" + ENDPOINT_RECORD_ID_PARAM + "/reviews";
+
         @Retention(RetentionPolicy.SOURCE)
-        @StringDef({CONFIGURATION, MOVIES_POPULAR, MOVIES_TOP_RATED})
+        @StringDef({CONFIGURATION, MOVIES_POPULAR, MOVIES_TOP_RATED, MOVIE_REVIEWS})
         public @interface Def {}
     }
 
@@ -51,6 +55,7 @@ class TMDBURLBuilder {
     private final String mTMDBBaseURL;
     private final String mAPIKey;
     private final @Endpoint.Def String mEndpoint;
+    private String mRecordId;
     private final Map<String, String> mQueryParams;
 
     /**
@@ -70,7 +75,26 @@ class TMDBURLBuilder {
         this.mTMDBBaseURL = tmdbBaseURL;
         this.mAPIKey = apiKey;
         this.mEndpoint = endpoint;
+        this.mRecordId = null;
         this.mQueryParams = new HashMap<>();
+    }
+
+    /**
+     * Set the record ID of the resource indicated by the {@link Endpoint}.
+     *
+     * @param recordId the record ID of the resource
+     * @return this TMDBURLBuilder instance.
+     */
+    public TMDBURLBuilder withRecordId(final long recordId) {
+
+        if (!endpointRequiresRecordId()) {
+            throw new IllegalStateException(String.format(
+                   "Endpoint %s does not require a record identifier to be set",
+                    mEndpoint));
+        }
+
+        mRecordId = String.valueOf(recordId);
+        return this;
     }
 
     /**
@@ -96,8 +120,20 @@ class TMDBURLBuilder {
      */
     public URL build() throws MalformedURLException {
 
+        String endpoint = mEndpoint;
+
+        if (endpointRequiresRecordId()) {
+            if (mRecordId != null) {
+                endpoint = mEndpoint.replace(ENDPOINT_RECORD_ID_PARAM, mRecordId);
+            } else {
+                throw new IllegalStateException(String.format(
+                        "Endpoint %s requires a record identifier to be set via method #withRecordId",
+                        mEndpoint));
+            }
+        }
+
         final Uri.Builder uriBuilder = Uri.parse(mTMDBBaseURL).buildUpon()
-                .appendEncodedPath(mEndpoint)
+                .appendEncodedPath(endpoint)
                 .appendQueryParameter(API_KEY_QUERY_PARAM, mAPIKey);
 
         for (Map.Entry<String, String> queryParam : mQueryParams.entrySet()) {
@@ -105,5 +141,9 @@ class TMDBURLBuilder {
         }
 
         return new URL(uriBuilder.build().toString());
+    }
+
+    private boolean endpointRequiresRecordId() {
+        return mEndpoint.contains(ENDPOINT_RECORD_ID_PARAM);
     }
 }
