@@ -28,7 +28,7 @@ public class JSONReviewTransformer implements JSONToObjectTransformer<Review> {
 
         Preconditions.checkNotNull(jsonObject, "jsonObject must not be null.");
 
-        final long id = jsonObject.getLong(JSON_KEY.ID);
+        final String id = jsonObject.getString(JSON_KEY.ID);
         final String author = jsonObject.getString(JSON_KEY.AUTHOR);
         final String content = jsonObject.getString(JSON_KEY.CONTENT);
 

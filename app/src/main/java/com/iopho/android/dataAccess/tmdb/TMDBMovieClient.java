@@ -5,6 +5,9 @@ import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
 import com.iopho.android.dataAccess.tmdb.model.Review;
+import com.iopho.android.dataAccess.tmdb.model.VideoLink;
+
+import java.util.List;
 
 /**
  * A TMDB (The Movie Database) client.
@@ -52,4 +55,17 @@ public interface TMDBMovieClient {
      */
     DataPage<Review> getMovieReviews(long movieId, int pageNumber)
             throws DataAccessRequestException, DataAccessParsingException;
+
+    /**
+     *
+     *
+     * @param movieId
+     * @return
+     * @throws DataAccessRequestException
+     * @throws DataAccessParsingException
+     */
+    List<VideoLink> getMovieVideoLinks(long movieId)
+            throws DataAccessRequestException, DataAccessParsingException;
+
+
 }

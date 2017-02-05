@@ -3,12 +3,10 @@ package com.iopho.android.dataAccess.tmdb.json;
 import com.google.common.base.Preconditions;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,22 +20,22 @@ public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataP
     private static class JSON_KEY {
         public static final String PAGE          = "page";
         public static final String TOTAL_PAGES   = "total_pages";
-        public static final String RESULTS       = "results";
         public static final String TOTAL_RESULTS = "total_results";
     }
 
-    private final JSONToObjectTransformer<T> resultJSONToObjectTransformer;
+    private final JSONResultListTransformer<T> resultsJSONToListTransformer;
 
     /**
      * Construct a new JSONDataPageTransformer.
      *
      * @param resultJSONToObjectTransformer a {@link JSONToObjectTransformer} that can transform a
-     *                                    {@link JSONObject} into a instance of <b>T</b>. Used to
-     *                                    transform the results of the JSON DataPage representation
-     *                                    into instances of <b>T</b>.
+     *                                      {@link JSONObject} into a instance of <b>T</b>. Used to
+     *                                      transform the results of the JSON DataPage
+     *                                      representation into instances of <b>T</b>.
      */
     public JSONDataPageTransformer(final JSONToObjectTransformer<T> resultJSONToObjectTransformer) {
-        this.resultJSONToObjectTransformer = resultJSONToObjectTransformer;
+        this.resultsJSONToListTransformer =
+                new JSONResultListTransformer(resultJSONToObjectTransformer);
     }
 
     /**
@@ -57,13 +55,7 @@ public class JSONDataPageTransformer<T> implements JSONToObjectTransformer<DataP
         // page number to 0 here.
         final int pageNumber = (totalPageCount == 0) ? 0 : jsonObject.getInt(JSON_KEY.PAGE);
 
-        final JSONArray resultsJSONArray = jsonObject.getJSONArray(JSON_KEY.RESULTS);
-        final List<T> resultList = new ArrayList<>(resultsJSONArray.length());
-
-        for (int i = 0; i < resultsJSONArray.length(); i++) {
-            resultList.add(resultJSONToObjectTransformer.transform(
-                    resultsJSONArray.getJSONObject(i)));
-        }
+        final List<T> resultList = resultsJSONToListTransformer.transform(jsonObject);
 
         return new DataPage(pageNumber, totalPageCount, totalResultCount, resultList);
     }

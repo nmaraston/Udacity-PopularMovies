@@ -24,15 +24,22 @@ class TMDBURLBuilder {
      */
     public static class Endpoint {
 
-        public static final String CONFIGURATION    = "configuration";
+        public static final String CONFIGURATION = "configuration";
 
-        public static final String MOVIES_POPULAR   = "movie/popular";
+        public static final String MOVIES_POPULAR = "movie/popular";
         public static final String MOVIES_TOP_RATED = "movie/top_rated";
 
         public static final String MOVIE_REVIEWS = "movie/" + ENDPOINT_RECORD_ID_PARAM + "/reviews";
+        public static final String MOVIE_VIDEOS = "movie/" + ENDPOINT_RECORD_ID_PARAM + "/videos";
 
         @Retention(RetentionPolicy.SOURCE)
-        @StringDef({CONFIGURATION, MOVIES_POPULAR, MOVIES_TOP_RATED, MOVIE_REVIEWS})
+        @StringDef({
+                CONFIGURATION,
+                MOVIES_POPULAR,
+                MOVIES_TOP_RATED,
+                MOVIE_REVIEWS,
+                MOVIE_VIDEOS
+        })
         public @interface Def {}
     }
 

@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 
 public class Review {
 
-    private final long mID;
+    private final String mID;
     private final String mAuthor;
     private final String mContent;
 
@@ -15,7 +15,7 @@ public class Review {
      * @param author name of the reviewer.
      * @param content review content.
      */
-    public Review(final long id,
+    public Review(final String id,
                   final String author,
                   final String content) {
 
@@ -30,7 +30,7 @@ public class Review {
     /**
      * @return unique TMDB review identifier.
      */
-    public long getID() {
+    public String getID() {
         return mID;
     }
 

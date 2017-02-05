@@ -7,11 +7,14 @@ import com.iopho.android.dataAccess.exception.DataAccessParsingException;
 import com.iopho.android.dataAccess.exception.DataAccessRequestException;
 import com.iopho.android.dataAccess.tmdb.json.JSONDataPageTransformer;
 import com.iopho.android.dataAccess.tmdb.json.JSONMovieTransformer;
+import com.iopho.android.dataAccess.tmdb.json.JSONResultListTransformer;
 import com.iopho.android.dataAccess.tmdb.json.JSONReviewTransformer;
 import com.iopho.android.dataAccess.tmdb.json.JSONToObjectTransformer;
+import com.iopho.android.dataAccess.tmdb.json.JSONVideoLinkTransformer;
 import com.iopho.android.dataAccess.tmdb.model.DataPage;
 import com.iopho.android.dataAccess.tmdb.model.Movie;
 import com.iopho.android.dataAccess.tmdb.model.Review;
+import com.iopho.android.dataAccess.tmdb.model.VideoLink;
 import com.iopho.android.util.HttpURLDownloader;
 
 import org.json.JSONException;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.List;
 
 /**
  * An implementation of a {@link TMDBMovieClient}
@@ -43,7 +47,7 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
      * @param httpURLDownloader an HttpURLDownloader to make HTTP requests.
      */
     TMDBMovieClientImpl(final String tmdbBaseURL, final String apiKey,
-                               final HttpURLDownloader httpURLDownloader) {
+                        final HttpURLDownloader httpURLDownloader) {
 
         Preconditions.checkNotNull(tmdbBaseURL, "tmdbBaseURL must not be null.");
         Preconditions.checkNotNull(apiKey, "apiKey must not be null.");
@@ -130,6 +134,30 @@ public class TMDBMovieClientImpl implements TMDBMovieClient {
                     new JSONDataPageTransformer<>(new JSONReviewTransformer());
 
             return queryTMDB(url, jsonReviewDataPageTransformer);
+
+        } catch (final MalformedURLException ex) {
+            throw new DataAccessRequestException("Failed to build request URL.", ex);
+        }
+    }
+
+    /**
+     * @see {@link TMDBMovieClient#getMovieVideoLinks(long)}
+     */
+    @Override
+    public List<VideoLink> getMovieVideoLinks(final long movieId)
+            throws DataAccessRequestException, DataAccessParsingException {
+
+        try {
+
+            final URL url = new TMDBURLBuilder(
+                    mTMDBBaseURL, mAPIKey, TMDBURLBuilder.Endpoint.MOVIE_VIDEOS)
+                    .withRecordId(movieId)
+                    .build();
+
+            final JSONResultListTransformer<VideoLink> jsonResultListTransformer =
+                    new JSONResultListTransformer(new JSONVideoLinkTransformer());
+
+            return queryTMDB(url, jsonResultListTransformer);
 
         } catch (final MalformedURLException ex) {
             throw new DataAccessRequestException("Failed to build request URL.", ex);
